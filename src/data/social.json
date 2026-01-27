@@ -1,0 +1,39 @@
+{
+  "socialLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com",
+      "icon": "github"
+    },
+    {
+      "name": "LinkedIn",
+      "url": "https://linkedin.com",
+      "icon": "linkedin"
+    },
+    {
+      "name": "Twitter",
+      "url": "https://twitter.com",
+      "icon": "twitter"
+    }
+  ],
+  "contactLinks": [
+    {
+      "icon": "📧",
+      "title": "Email",
+      "description": "hello@example.com",
+      "href": "mailto:hello@example.com"
+    },
+    {
+      "icon": "💼",
+      "title": "LinkedIn",
+      "description": "linkedin.com/in/yourname",
+      "href": "https://linkedin.com"
+    },
+    {
+      "icon": "🐙",
+      "title": "GitHub",
+      "description": "github.com/yourname",
+      "href": "https://github.com"
+    }
+  ]
+}
