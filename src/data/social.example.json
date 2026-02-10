@@ -2,17 +2,17 @@
   "socialLinks": [
     {
       "name": "GitHub",
-      "url": "https://github.com",
+      "url": "https://github.com/yourusername",
       "icon": "github"
     },
     {
       "name": "LinkedIn",
-      "url": "https://linkedin.com",
+      "url": "https://linkedin.com/in/yourname",
       "icon": "linkedin"
     },
     {
       "name": "Twitter",
-      "url": "https://twitter.com",
+      "url": "https://twitter.com/yourhandle",
       "icon": "twitter"
     }
   ],
@@ -20,20 +20,20 @@
     {
       "icon": "📧",
       "title": "Email",
-      "description": "hello@example.com",
-      "href": "mailto:hello@example.com"
+      "description": "your.email@example.com",
+      "href": "mailto:your.email@example.com"
     },
     {
       "icon": "💼",
       "title": "LinkedIn",
       "description": "linkedin.com/in/yourname",
-      "href": "https://linkedin.com"
+      "href": "https://linkedin.com/in/yourname"
     },
     {
       "icon": "🐙",
       "title": "GitHub",
-      "description": "github.com/yourname",
-      "href": "https://github.com"
+      "description": "github.com/yourusername",
+      "href": "https://github.com/yourusername"
     }
   ]
 }

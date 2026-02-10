@@ -1,14 +1,16 @@
-.PHONY: help install dev build lint lint-fix clean clean-all kill
+.PHONY: help install run build lint lint-fix clean clean-all kill toggle-env-dev toggle-env-prod
 
 help:
 	@echo "Modern Portfolio - Next.js Development Makefile"
 	@echo "=============================================="
 	@echo ""
 	@echo "Installation & Setup:"
-	@echo "  make install      Install dependencies"
+	@echo "  make install           Install dependencies"
+	@echo "  make toggle-env-dev    Set environment to development"
+	@echo "  make toggle-env-prod   Set environment to production"
 	@echo ""
 	@echo "Development:"
-	@echo "  make dev          Start development server (port 3000)"
+	@echo "  make run          Start development server (port 3000)"
 	@echo "  make build        Build for production"
 	@echo "  make start        Start production server"
 	@echo ""
@@ -29,9 +31,15 @@ install:
 	npm install
 	@echo "✓ Dependencies installed"
 
+toggle-env-dev:
+	@bash toggle-env.sh dev
+
+toggle-env-prod:
+	@bash toggle-env.sh prod
+
 # ==================== Development ====================
 
-dev:
+run:
 	@echo "Starting development server on http://localhost:3000"
 	@echo "Press Ctrl+C to stop"
 	npm run dev
