@@ -31,22 +31,27 @@ At the current stage, there is one owner and no immediate team-scale permission 
 
 ## Decision
 
-Retain GitHub as the current VCS hosting platform and implement prefix-based repository naming as a lightweight grouping strategy.
+Retain GitHub as the current VCS hosting platform and implement project-first repository naming as a lightweight grouping strategy.
 
 Supporting decisions:
 
-- Use consistent prefixes for new repos to create pseudo-grouping.
+- Use a consistent project-first naming pattern for new repos: `<project>-<domain>-<component>`.
 - Keep architecture and infrastructure ownership decisions (for example Kafka broker placement between producer and notifier contexts) separate from VCS platform decisions.
 - Defer GitLab migration unless explicit trigger conditions are met.
 - Reassess this ADR when team size, repository count, or access-control complexity increases.
 
 ## Naming Convention
 
-Adopt and enforce explicit prefixes for repository naming:
+Adopt and enforce a project-first repository naming convention:
 
-- `portfolio-*` for portfolio-facing applications and supporting components.
-- `notifier-*` for notification pipeline components.
-- `infra-*` for shared operational infrastructure where applicable.
+- Pattern: `<project>-<domain>-<component>`
+- Project segment: `portfolio`
+
+Examples:
+
+- `portfolio-infra-messaging`
+- `portfolio-notifier-contracts`
+- `portfolio-notifier-service`
 
 Guidelines:
 
@@ -126,6 +131,9 @@ Re-open this decision if any of the following occur:
 - Apply naming convention immediately for new repositories.
 - Keep existing repo topology unchanged in the near term.
 - Continue architecture work (including notifier/Kafka responsibilities) independent of VCS migration.
+- Initial repository alignment completed:
+  - `infra-messaging` -> `portfolio-infra-messaging`
+  - `notifier-contracts` -> `portfolio-notifier-contracts`
 
 ## Success Criteria
 
