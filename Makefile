@@ -1,88 +1,127 @@
-.PHONY: help install run build lint lint-fix clean clean-all kill toggle-env-dev toggle-env-prod
+VENV ?= .venv
+BACKEND_DIR ?= calendar
+PORTFOLIO_PORT ?= 3000
+CALENDAR_API_PORT ?= 8000
+
+.PHONY: help \
+	prepare-portfolio-data \
+	frontend-setup frontend frontend-build frontend-start \
+	backend-setup backend backend-test backend-shell backend-migrate \
+	up compose-build down logs ps config \
+	install run build start lint lint-fix clean clean-all kill
 
 help:
-	@echo "Modern Portfolio - Next.js Development Makefile"
-	@echo "=============================================="
+	@echo "Portfolio Monorepo"
+	@echo "================="
 	@echo ""
-	@echo "Installation & Setup:"
-	@echo "  make install           Install dependencies"
-	@echo "  make toggle-env-dev    Set environment to development"
-	@echo "  make toggle-env-prod   Set environment to production"
+	@echo "Frontend (Next.js):"
+	@echo "  make frontend-setup   Install frontend dependencies"
+	@echo "  make frontend         Run frontend dev server (localhost:$(PORTFOLIO_PORT))"
+	@echo "  make frontend-build   Build frontend"
+	@echo "  make frontend-start   Start production frontend"
 	@echo ""
-	@echo "Development:"
-	@echo "  make run          Start development server (port 3000)"
-	@echo "  make build        Build for production"
-	@echo "  make start        Start production server"
+	@echo "Backend (Django):"
+	@echo "  make backend-setup    Create venv, install deps, and migrate"
+	@echo "  make backend          Run backend dev server (localhost:$(CALENDAR_API_PORT))"
+	@echo "  make backend-test     Run backend tests"
+	@echo "  make backend-shell    Open Django shell"
+	@echo "  make backend-migrate  Apply migrations"
 	@echo ""
-	@echo "Code Quality:"
-	@echo "  make lint         Run ESLint"
-	@echo "  make lint-fix     Fix ESLint issues"
+	@echo "Full Stack (Docker Compose):"
+	@echo "  make up               Build and run frontend + backend"
+	@echo "  make compose-build    Build compose images"
+	@echo "  make down             Stop and remove containers"
+	@echo "  make logs             Follow compose logs"
+	@echo "  make ps               Show compose services"
+	@echo "  make config           Render merged compose config"
 	@echo ""
-	@echo "Cleanup:"
-	@echo "  make clean        Remove build artifacts and cache"
-	@echo "  make clean-all    Clean + remove node_modules"
-	@echo "  make kill         Kill process on port 3000"
-	@echo ""
+	@echo "Legacy aliases (frontend): install run build start lint lint-fix clean clean-all kill"
 
-# ==================== Installation & Setup ====================
+prepare-portfolio-data:
+	@if [ ! -f src/data/portfolio.json ] && [ -f src/data/portfolio.example.json ]; then \
+		cp src/data/portfolio.example.json src/data/portfolio.json; \
+	fi
+	@if [ ! -f src/data/social.json ] && [ -f src/data/social.example.json ]; then \
+		cp src/data/social.example.json src/data/social.json; \
+	fi
 
-install:
-	@echo "Installing dependencies..."
-	npm install
-	@echo "✓ Dependencies installed"
+frontend-setup: prepare-portfolio-data
+	npm ci
 
-toggle-env-dev:
-	@bash toggle-env.sh dev
+frontend: prepare-portfolio-data
+	@set -a; [ -f .env ] && . ./.env; set +a; \
+	NEXT_PUBLIC_API_BASE_URL=$${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000} \
+	NEXT_PUBLIC_GOOGLE_CLIENT_ID=$${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-} \
+	NEXT_PUBLIC_DISPLAY_NAME=$${NEXT_PUBLIC_DISPLAY_NAME:-Your Name} \
+	NEXT_PUBLIC_CONTACT_EMAIL=$${NEXT_PUBLIC_CONTACT_EMAIL:-hello@example.com} \
+	npm run dev -- --hostname 0.0.0.0 --port $${PORTFOLIO_PORT:-$(PORTFOLIO_PORT)}
 
-toggle-env-prod:
-	@bash toggle-env.sh prod
-
-# ==================== Development ====================
-
-run:
-	@echo "Starting development server on http://localhost:3000"
-	@echo "Press Ctrl+C to stop"
-	npm run dev
-
-build:
-	@echo "Building for production..."
+frontend-build: prepare-portfolio-data
 	npm run build
-	@echo "✓ Build complete"
 
-start: build
-	@echo "Starting production server on http://localhost:3000"
+frontend-start:
 	npm run start
 
-# ==================== Code Quality ====================
+backend-setup:
+	@set -a; [ -f .env ] && . ./.env; set +a; \
+	cd $(BACKEND_DIR); \
+	[ -x $(VENV)/bin/python ] || python3 -m venv $(VENV); \
+	$(MAKE) install migrate
+
+backend:
+	@set -a; [ -f .env ] && . ./.env; set +a; \
+	$(MAKE) -C $(BACKEND_DIR) runserver
+
+backend-test:
+	@set -a; [ -f .env ] && . ./.env; set +a; \
+	$(MAKE) -C $(BACKEND_DIR) test
+
+backend-shell:
+	@set -a; [ -f .env ] && . ./.env; set +a; \
+	$(MAKE) -C $(BACKEND_DIR) shell
+
+backend-migrate:
+	@set -a; [ -f .env ] && . ./.env; set +a; \
+	$(MAKE) -C $(BACKEND_DIR) migrate
+
+up: prepare-portfolio-data
+	docker compose up --build
+
+compose-build: prepare-portfolio-data
+	docker compose build
+
+down:
+	docker compose down --remove-orphans
+
+logs:
+	docker compose logs -f --tail=200
+
+ps:
+	docker compose ps
+
+config:
+	docker compose config
+
+# ---------- Legacy frontend aliases ----------
+install: frontend-setup
+run: frontend
+build: frontend-build
+start: frontend-start
 
 lint:
-	@echo "Running ESLint..."
 	npm run lint
 
 lint-fix:
-	@echo "Fixing ESLint issues..."
 	npm run lint -- --fix
 
-# ==================== Cleanup ====================
-
 clean:
-	@echo "Cleaning build artifacts..."
-	rm -rf .next
-	rm -rf dist
+	rm -rf .next dist
 	find . -type d -name ".turbo" -exec rm -rf {} + 2>/dev/null || true
-	@echo "✓ Build artifacts cleaned"
 
 clean-all: clean
-	@echo "Removing node_modules..."
 	rm -rf node_modules
-	rm -f package-lock.json
-	@echo "✓ All cleaned"
-
-# ==================== Utilities ====================
 
 kill:
-	@echo "Killing process on port 3000..."
 	@lsof -ti:3000,3001 | xargs kill -9 2>/dev/null || echo "No process found on port 3000"
-	@echo "✓ Process terminated"
 
 .DEFAULT_GOAL := help
