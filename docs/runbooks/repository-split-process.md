@@ -32,7 +32,7 @@ Define ownership before moving files.
 
 Move or create artifacts:
 
-- `infra/messaging/docker-compose.messaging.yml`
+- `infra/messaging/docker-compose.yml`
 - `contracts/notifier/events/*.schema.json`
 - Boundary README files in each directory
 
@@ -41,7 +41,7 @@ Move or create artifacts:
 Ensure merged compose behavior remains one command:
 
 - Base app compose: `docker-compose.yml`
-- Messaging compose: `infra/messaging/docker-compose.messaging.yml`
+- Messaging compose: `infra/messaging/docker-compose.yml`
 - `Makefile` composes both for `make up`
 
 Provide app-only fallback command:
@@ -89,6 +89,22 @@ git push <portfolio-notifier-contracts-remote> split/notifier-contracts:main
 
 If target repositories were auto-initialized and histories conflict, perform a
 normal clone/copy flow instead of force pushing by default.
+
+## Step 7: Convert Boundaries to Submodules
+
+After dedicated repositories are populated, replace in-repo copies with
+submodule references:
+
+```bash
+git submodule add git@github.com:Nickatak/portfolio-infra-messaging.git infra/messaging
+git submodule add git@github.com:Nickatak/portfolio-notifier-contracts.git contracts/notifier
+```
+
+Bootstrap for consumers:
+
+```bash
+git submodule update --init --recursive
+```
 
 ## Post-Split Governance
 

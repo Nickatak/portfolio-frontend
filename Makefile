@@ -4,7 +4,7 @@ BACKEND_DIR ?= backend
 PORTFOLIO_PORT ?= 3000
 CALENDAR_API_PORT ?= 8000
 COMPOSE_BASE_FILE ?= docker-compose.yml
-COMPOSE_MESSAGING_FILE ?= infra/messaging/docker-compose.messaging.yml
+COMPOSE_MESSAGING_FILE ?= infra/messaging/docker-compose.yml
 COMPOSE_FILES ?= -f $(COMPOSE_BASE_FILE) -f $(COMPOSE_MESSAGING_FILE)
 COMPOSE ?= docker compose $(COMPOSE_FILES)
 

@@ -15,9 +15,9 @@ Primary product repo for portfolio-facing apps and local orchestration.
   - `frontend/` (Next.js web app)
   - `backend/` (Django calendar API producer)
   - Root app orchestration (`docker-compose.yml`, `Makefile`)
-- Contains split-boundary staging directories:
-  - `infra/messaging/` (messaging infra definitions)
-  - `contracts/notifier/` (notifier event schemas)
+- Contains submodule boundaries:
+  - `infra/messaging/` (submodule to `portfolio-infra-messaging`)
+  - `contracts/notifier/` (submodule to `portfolio-notifier-contracts`)
 
 ### 2. `portfolio-infra-messaging`
 
@@ -56,7 +56,7 @@ Consumer/worker implementation for notification processing.
 The local full stack is composed from two files:
 
 1. `docker-compose.yml` (app services)
-2. `infra/messaging/docker-compose.messaging.yml` (messaging services)
+2. `infra/messaging/docker-compose.yml` (messaging services)
 
 `Makefile` binds both by default so `make up` preserves one-command startup.
 
@@ -80,7 +80,7 @@ portfolio/
 ├── docker-compose.yml                # app-only compose layer
 ├── infra/
 │   └── messaging/
-│       ├── docker-compose.messaging.yml
+│       ├── docker-compose.yml
 │       └── README.md
 ├── contracts/
 │   └── notifier/

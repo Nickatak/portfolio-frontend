@@ -39,14 +39,14 @@ project-first repository strategy.
 ### Boundary Structure
 
 - App runtime compose remains at root: `docker-compose.yml`
-- Messaging infra compose extracted to: `infra/messaging/docker-compose.messaging.yml`
+- Messaging infra compose extracted to: `infra/messaging/docker-compose.yml`
 - Notifier event contracts extracted to: `contracts/notifier/events/`
 
 ### Workflow Decisions
 
 - Root `Makefile` compose commands now merge:
   - `docker-compose.yml`
-  - `infra/messaging/docker-compose.messaging.yml`
+  - `infra/messaging/docker-compose.yml`
 - `make up` keeps full-stack behavior.
 - `make up-core` runs app services without messaging infra.
 
@@ -113,6 +113,7 @@ Accepted.
 - Kafka services were moved out of root compose into `infra/messaging/`.
 - Notifier schemas were introduced under `contracts/notifier/events/`.
 - `Makefile` compose targets were updated to use merged compose files.
+- Boundary directories were converted to Git submodules so source-of-truth lives in dedicated repositories.
 - Supporting architecture/process documentation was added.
 
 ## Success Criteria

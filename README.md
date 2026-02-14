@@ -12,8 +12,8 @@ The previous standalone repos (`calendar`, `portfolio_orchestration`) were merge
 - `frontend/` - Next.js frontend app
 - `backend/` - Django backend app
 - `docker-compose.yml` - app stack compose definition (`web` + `calendar-api`)
-- `infra/messaging/docker-compose.messaging.yml` - messaging infra compose definition (`kafka` + topic bootstrap)
-- `contracts/notifier/` - notifier event contract schemas (split boundary for contracts repo)
+- `infra/messaging/docker-compose.yml` - messaging infra compose definition (`kafka` + topic bootstrap), sourced from submodule `portfolio-infra-messaging`
+- `contracts/notifier/` - notifier event contract schemas, sourced from submodule `portfolio-notifier-contracts`
 - `.env.example` - shared root env template for local + compose
 - `Makefile` - root commands for frontend, backend, and full stack
 
@@ -23,7 +23,11 @@ The previous standalone repos (`calendar`, `portfolio_orchestration`) were merge
    ```bash
    cp .env.example .env
    ```
-2. Ensure frontend data files exist:
+2. Initialize submodules:
+   ```bash
+   git submodule update --init --recursive
+   ```
+3. Ensure frontend data files exist:
    ```bash
    make prepare-portfolio-data
    ```
@@ -57,7 +61,7 @@ make up
 This now brings up:
 - `web` (Next.js)
 - `calendar-api` (Django)
-- `kafka` + `kafka-init` (from `infra/messaging/docker-compose.messaging.yml`)
+- `kafka` + `kafka-init` (from `infra/messaging/docker-compose.yml`)
 
 To run app services without messaging infra:
 ```bash
