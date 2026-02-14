@@ -52,6 +52,11 @@ URLs:
 make up
 ```
 
+This now brings up:
+- `web` (Next.js)
+- `calendar-api` (Django)
+- `kafka` + `kafka-init` (broker + topic bootstrap for appointment events)
+
 Other useful compose commands:
 ```bash
 make compose-build
@@ -76,6 +81,11 @@ Commonly edited values:
 - `CALENDAR_API_PORT`
 - `PORTFOLIO_CONTEXT` (default `./frontend`)
 - `CALENDAR_CONTEXT` (default `./backend`)
+- `KAFKA_PRODUCER_ENABLED`
+- `KAFKA_BOOTSTRAP_SERVERS` (for local non-Docker backend runs)
+- `KAFKA_BOOTSTRAP_SERVERS_DOCKER` (used by compose `calendar-api` service)
+- `KAFKA_TOPIC_APPOINTMENTS_CREATED`
+- `KAFKA_TOPIC_APPOINTMENTS_CREATED_DLQ`
 
 Backend-specific vars are also in root `.env` (`DEBUG`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, etc.) and are passed when running backend via root Makefile.
 

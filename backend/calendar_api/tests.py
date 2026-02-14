@@ -1,7 +1,8 @@
 from datetime import datetime
+from unittest import mock
 
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
@@ -111,6 +112,65 @@ class TimeSlotModelTests(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIsNone(response.data['contact'])
+
+
+class TimeSlotKafkaProducerSignalTests(TestCase):
+    def setUp(self):
+        self.contact = Contact.objects.create(
+            first_name='Kafka',
+            last_name='Tester',
+            email='kafka.tester@example.com',
+            phone_number='+15555555555',
+        )
+
+    def test_timeslot_create_publishes_event_when_enabled(self):
+        publisher = mock.Mock(return_value={'topic': 'appointments.created', 'partition': 0, 'offset': 3})
+
+        with (
+            override_settings(KAFKA_PRODUCER_ENABLED=True),
+            mock.patch('calendar_api.services.appointment_events._import_publish_function', return_value=publisher),
+            self.captureOnCommitCallbacks(execute=True),
+        ):
+            timeslot = TimeSlot.objects.create(
+                time=aware_dt(2026, 1, 27, 16, 0),
+                topic='Kafka Enabled',
+                contact=self.contact,
+            )
+
+        publisher.assert_called_once()
+        payload = publisher.call_args.args[0]
+        self.assertEqual(payload['event_type'], 'appointments.created')
+        self.assertEqual(payload['appointment']['appointment_id'], f'timeslot-{timeslot.id}')
+        self.assertEqual(payload['appointment']['email'], self.contact.email)
+        self.assertEqual(payload['notify']['email'], True)
+
+    def test_timeslot_create_does_not_publish_when_disabled(self):
+        with (
+            override_settings(KAFKA_PRODUCER_ENABLED=False),
+            mock.patch('calendar_api.services.appointment_events._import_publish_function') as import_mock,
+            self.captureOnCommitCallbacks(execute=True),
+        ):
+            TimeSlot.objects.create(
+                time=aware_dt(2026, 1, 27, 17, 0),
+                topic='Kafka Disabled',
+                contact=self.contact,
+            )
+
+        import_mock.assert_not_called()
+
+    def test_timeslot_create_without_contact_skips_publisher(self):
+        with (
+            override_settings(KAFKA_PRODUCER_ENABLED=True),
+            mock.patch('calendar_api.services.appointment_events._import_publish_function') as import_mock,
+            self.captureOnCommitCallbacks(execute=True),
+        ):
+            TimeSlot.objects.create(
+                time=aware_dt(2026, 1, 27, 18, 0),
+                topic='No Contact',
+                contact=None,
+            )
+
+        import_mock.assert_not_called()
 
 
 class TimeSlotApiTests(APITestCase):

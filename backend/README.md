@@ -42,6 +42,24 @@ See `.env.example` for defaults.
 - `TIME_ZONE`
 - `CORS_ALLOWED_ORIGINS` (comma-separated)
 - `CSRF_TRUSTED_ORIGINS` (comma-separated)
+- `KAFKA_PRODUCER_ENABLED`
+- `KAFKA_NOTIFY_EMAIL_DEFAULT`
+- `KAFKA_NOTIFY_SMS_DEFAULT`
+- `KAFKA_BOOTSTRAP_SERVERS`
+- `KAFKA_TOPIC_APPOINTMENTS_CREATED`
+- `KAFKA_TOPIC_APPOINTMENTS_CREATED_DLQ`
+
+## Kafka Producer Integration
+
+`calendar_api` publishes `appointments.created` events when a new `TimeSlot` is created and:
+- `KAFKA_PRODUCER_ENABLED=true`
+- the timeslot has a contact with a non-empty email
+
+Publishing uses `kafka-notifications-lib` (`notifier_microservice`) and sends
+payloads shaped for the notifier worker.
+
+Default behavior is safe for local development: producer is disabled until
+explicitly enabled.
 
 ## API Endpoints
 

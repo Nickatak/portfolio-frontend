@@ -125,3 +125,29 @@ CORS_ALLOWED_ORIGINS = _env_list('CORS_ALLOWED_ORIGINS', [
 ])
 
 CSRF_TRUSTED_ORIGINS = _env_list('CSRF_TRUSTED_ORIGINS', [])
+
+# Kafka producer configuration (calendar_api -> notifier service)
+KAFKA_PRODUCER_ENABLED = _env_bool('KAFKA_PRODUCER_ENABLED', False)
+KAFKA_NOTIFY_EMAIL_DEFAULT = _env_bool('KAFKA_NOTIFY_EMAIL_DEFAULT', True)
+KAFKA_NOTIFY_SMS_DEFAULT = _env_bool('KAFKA_NOTIFY_SMS_DEFAULT', False)
+
+
+# Logging
+# Keep default Django logging behavior, but surface Kafka publish outcomes
+# from calendar_api in container logs.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'calendar_api.services.appointment_events': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
