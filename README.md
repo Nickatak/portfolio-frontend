@@ -97,3 +97,4 @@ Backend-specific vars are also in root `.env` (`DEBUG`, `ALLOWED_HOSTS`, `CORS_A
 ## Architecture Decisions
 
 - `docs/adr/0001-monorepo-adoption.md` - why this project moved from multi-repo orchestration to a monorepo.
+- `docs/adr/0002-retain-github-and-adopt-prefix-grouping.md` - why this project is staying on GitHub for now and using prefix-based repo grouping.
