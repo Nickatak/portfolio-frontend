@@ -59,6 +59,7 @@ src/
 
 - Node.js 18+
 - npm or yarn
+- Docker (optional, for containerized runs)
 
 ### Installation
 
@@ -81,6 +82,7 @@ src/
 
    **Required variables:**
    - `NEXT_PUBLIC_GOOGLE_CLIENT_ID` - Get from [Google Cloud Console](https://console.cloud.google.com/)
+   - `NEXT_PUBLIC_API_BASE_URL` - Calendar backend base URL (default local dev: `http://localhost:8000`)
 
 4. Set up portfolio data files:
    ```bash
@@ -126,6 +128,22 @@ make start
 # or
 npm run start
 ```
+
+## Docker
+
+Docker orchestration for the full system now lives in a separate stack repo (for example, `../portfolio-stack`), while this repo keeps only app-level Docker build assets (`Dockerfile`, `.dockerignore`).
+
+From the stack repo:
+
+```bash
+cp .env.example .env
+# edit .env paths/values as needed
+docker compose up --build
+```
+
+### Important Note About `NEXT_PUBLIC_*`
+
+`NEXT_PUBLIC_*` variables are embedded into client-side bundles at build time. If you change `NEXT_PUBLIC_API_BASE_URL`, rebuild the image so the browser code gets the new value.
 
 ## Environment Management
 
@@ -187,7 +205,7 @@ The project includes a `ScheduleCallSection` component that integrates with a se
 - Form validation and user data handling
 - Responsive UI with Tailwind CSS
 
-The calendar backend runs on `http://localhost:8000` by default during development.
+The calendar backend URL is controlled via `NEXT_PUBLIC_API_BASE_URL` (default `http://localhost:8000` during local development).
 
 ## Available Scripts
 
