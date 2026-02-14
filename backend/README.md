@@ -61,6 +61,10 @@ payloads shaped for the notifier worker.
 Default behavior is safe for local development: producer is disabled until
 explicitly enabled.
 
+Contract schemas for these payloads are tracked at:
+- `contracts/notifier/events/appointments.created.schema.json` (producer contract)
+- `contracts/notifier/events/appointments.created.dlq.schema.json` (DLQ envelope)
+
 ## API Endpoints
 
 - `GET /healthz` - service health check

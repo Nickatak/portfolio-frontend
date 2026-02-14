@@ -3,12 +3,16 @@ FRONTEND_DIR ?= frontend
 BACKEND_DIR ?= backend
 PORTFOLIO_PORT ?= 3000
 CALENDAR_API_PORT ?= 8000
+COMPOSE_BASE_FILE ?= docker-compose.yml
+COMPOSE_MESSAGING_FILE ?= infra/messaging/docker-compose.messaging.yml
+COMPOSE_FILES ?= -f $(COMPOSE_BASE_FILE) -f $(COMPOSE_MESSAGING_FILE)
+COMPOSE ?= docker compose $(COMPOSE_FILES)
 
 .PHONY: help \
 	prepare-portfolio-data \
 	frontend-setup frontend frontend-build frontend-start \
 	backend-setup backend backend-test backend-shell backend-migrate \
-	up compose-build down logs ps config \
+	up up-core compose-build down logs ps config \
 	install run build start lint lint-fix clean clean-all kill
 
 help:
@@ -29,7 +33,8 @@ help:
 	@echo "  make backend-migrate  Apply migrations"
 	@echo ""
 	@echo "Full Stack (Docker Compose):"
-	@echo "  make up               Build and run frontend + backend"
+	@echo "  make up               Build and run frontend + backend + messaging infra"
+	@echo "  make up-core          Build and run frontend + backend only"
 	@echo "  make compose-build    Build compose images"
 	@echo "  make down             Stop and remove containers"
 	@echo "  make logs             Follow compose logs"
@@ -87,22 +92,25 @@ backend-migrate:
 	$(MAKE) -C $(BACKEND_DIR) migrate
 
 up: prepare-portfolio-data
-	docker compose up --build
+	$(COMPOSE) up --build
+
+up-core: prepare-portfolio-data
+	docker compose -f $(COMPOSE_BASE_FILE) up --build
 
 compose-build: prepare-portfolio-data
-	docker compose build
+	$(COMPOSE) build
 
 down:
-	docker compose down --remove-orphans
+	$(COMPOSE) down --remove-orphans
 
 logs:
-	docker compose logs -f --tail=200
+	$(COMPOSE) logs -f --tail=200
 
 ps:
-	docker compose ps
+	$(COMPOSE) ps
 
 config:
-	docker compose config
+	$(COMPOSE) config
 
 # ---------- Legacy frontend aliases ----------
 install: frontend-setup

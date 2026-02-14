@@ -11,7 +11,9 @@ The previous standalone repos (`calendar`, `portfolio_orchestration`) were merge
 
 - `frontend/` - Next.js frontend app
 - `backend/` - Django backend app
-- `docker-compose.yml` - full-stack compose definition
+- `docker-compose.yml` - app stack compose definition (`web` + `calendar-api`)
+- `infra/messaging/docker-compose.messaging.yml` - messaging infra compose definition (`kafka` + topic bootstrap)
+- `contracts/notifier/` - notifier event contract schemas (split boundary for contracts repo)
 - `.env.example` - shared root env template for local + compose
 - `Makefile` - root commands for frontend, backend, and full stack
 
@@ -55,7 +57,12 @@ make up
 This now brings up:
 - `web` (Next.js)
 - `calendar-api` (Django)
-- `kafka` + `kafka-init` (broker + topic bootstrap for appointment events)
+- `kafka` + `kafka-init` (from `infra/messaging/docker-compose.messaging.yml`)
+
+To run app services without messaging infra:
+```bash
+make up-core
+```
 
 Other useful compose commands:
 ```bash
@@ -97,4 +104,10 @@ Backend-specific vars are also in root `.env` (`DEBUG`, `ALLOWED_HOSTS`, `CORS_A
 ## Architecture Decisions
 
 - `docs/adr/0001-monorepo-adoption.md` - why this project moved from multi-repo orchestration to a monorepo.
-- `docs/adr/0002-retain-github-and-adopt-prefix-grouping.md` - why this project is staying on GitHub for now and using prefix-based repo grouping.
+- `docs/adr/0002-retain-github-and-adopt-prefix-grouping.md` - why this project is staying on GitHub for now and using project-first repo grouping.
+- `docs/adr/0003-split-infra-and-contract-boundaries.md` - why messaging infra and notifier contracts were split into dedicated boundaries.
+
+## Architecture Docs
+
+- `docs/architecture/repository-structure.md` - current multi-repo boundary map and ownership model.
+- `docs/runbooks/repository-split-process.md` - repeatable process for splitting/syncing boundary directories into dedicated repos.

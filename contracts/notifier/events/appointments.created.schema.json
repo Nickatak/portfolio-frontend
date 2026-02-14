@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Nickatak/portfolio-notifier-contracts/schemas/events/appointments.created.schema.json",
+  "title": "appointments.created",
+  "description": "Emitted when a new calendar time slot is created with a contact email.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "event_type",
+    "occurred_at",
+    "notify",
+    "appointment"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "pattern": "^evt-[0-9a-fA-F-]{36}$"
+    },
+    "event_type": {
+      "const": "appointments.created"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "notify": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "email",
+        "sms"
+      ],
+      "properties": {
+        "email": {
+          "type": "boolean"
+        },
+        "sms": {
+          "type": "boolean"
+        }
+      }
+    },
+    "appointment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "appointment_id",
+        "user_id",
+        "time",
+        "email"
+      ],
+      "properties": {
+        "appointment_id": {
+          "type": "string",
+          "pattern": "^timeslot-[0-9]+$"
+        },
+        "user_id": {
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "phone_e164": {
+          "type": "string",
+          "pattern": "^\\+[1-9][0-9]{7,14}$"
+        }
+      }
+    }
+  }
+}
