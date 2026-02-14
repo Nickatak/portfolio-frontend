@@ -96,4 +96,4 @@ make docker-build
 make docker-run
 ```
 
-Or run as part of orchestration from `portfolio-stack` root using Docker Compose.
+Or run as part of this monorepo from the root using Docker Compose.

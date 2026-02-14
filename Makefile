@@ -1,5 +1,6 @@
 VENV ?= .venv
-BACKEND_DIR ?= calendar
+FRONTEND_DIR ?= frontend
+BACKEND_DIR ?= backend
 PORTFOLIO_PORT ?= 3000
 CALENDAR_API_PORT ?= 8000
 
@@ -15,13 +16,13 @@ help:
 	@echo "================="
 	@echo ""
 	@echo "Frontend (Next.js):"
-	@echo "  make frontend-setup   Install frontend dependencies"
+	@echo "  make frontend-setup   Install frontend dependencies ($(FRONTEND_DIR)/)"
 	@echo "  make frontend         Run frontend dev server (localhost:$(PORTFOLIO_PORT))"
-	@echo "  make frontend-build   Build frontend"
-	@echo "  make frontend-start   Start production frontend"
+	@echo "  make frontend-build   Build frontend ($(FRONTEND_DIR)/)"
+	@echo "  make frontend-start   Start production frontend ($(FRONTEND_DIR)/)"
 	@echo ""
 	@echo "Backend (Django):"
-	@echo "  make backend-setup    Create venv, install deps, and migrate"
+	@echo "  make backend-setup    Create venv, install deps, and migrate ($(BACKEND_DIR)/)"
 	@echo "  make backend          Run backend dev server (localhost:$(CALENDAR_API_PORT))"
 	@echo "  make backend-test     Run backend tests"
 	@echo "  make backend-shell    Open Django shell"
@@ -38,18 +39,19 @@ help:
 	@echo "Legacy aliases (frontend): install run build start lint lint-fix clean clean-all kill"
 
 prepare-portfolio-data:
-	@if [ ! -f src/data/portfolio.json ] && [ -f src/data/portfolio.example.json ]; then \
-		cp src/data/portfolio.example.json src/data/portfolio.json; \
+	@if [ ! -f $(FRONTEND_DIR)/src/data/portfolio.json ] && [ -f $(FRONTEND_DIR)/src/data/portfolio.example.json ]; then \
+		cp $(FRONTEND_DIR)/src/data/portfolio.example.json $(FRONTEND_DIR)/src/data/portfolio.json; \
 	fi
-	@if [ ! -f src/data/social.json ] && [ -f src/data/social.example.json ]; then \
-		cp src/data/social.example.json src/data/social.json; \
+	@if [ ! -f $(FRONTEND_DIR)/src/data/social.json ] && [ -f $(FRONTEND_DIR)/src/data/social.example.json ]; then \
+		cp $(FRONTEND_DIR)/src/data/social.example.json $(FRONTEND_DIR)/src/data/social.json; \
 	fi
 
 frontend-setup: prepare-portfolio-data
-	npm ci
+	cd $(FRONTEND_DIR) && npm ci
 
 frontend: prepare-portfolio-data
 	@set -a; [ -f .env ] && . ./.env; set +a; \
+	cd $(FRONTEND_DIR); \
 	NEXT_PUBLIC_API_BASE_URL=$${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000} \
 	NEXT_PUBLIC_GOOGLE_CLIENT_ID=$${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-} \
 	NEXT_PUBLIC_DISPLAY_NAME=$${NEXT_PUBLIC_DISPLAY_NAME:-Your Name} \
@@ -57,10 +59,10 @@ frontend: prepare-portfolio-data
 	npm run dev -- --hostname 0.0.0.0 --port $${PORTFOLIO_PORT:-$(PORTFOLIO_PORT)}
 
 frontend-build: prepare-portfolio-data
-	npm run build
+	cd $(FRONTEND_DIR) && npm run build
 
 frontend-start:
-	npm run start
+	cd $(FRONTEND_DIR) && npm run start
 
 backend-setup:
 	@set -a; [ -f .env ] && . ./.env; set +a; \
@@ -109,19 +111,19 @@ build: frontend-build
 start: frontend-start
 
 lint:
-	npm run lint
+	cd $(FRONTEND_DIR) && npm run lint
 
 lint-fix:
-	npm run lint -- --fix
+	cd $(FRONTEND_DIR) && npm run lint -- --fix
 
 clean:
-	rm -rf .next dist
-	find . -type d -name ".turbo" -exec rm -rf {} + 2>/dev/null || true
+	rm -rf $(FRONTEND_DIR)/.next $(FRONTEND_DIR)/dist
+	find $(FRONTEND_DIR) -type d -name ".turbo" -exec rm -rf {} + 2>/dev/null || true
 
 clean-all: clean
-	rm -rf node_modules
+	rm -rf $(FRONTEND_DIR)/node_modules
 
 kill:
-	@lsof -ti:3000,3001 | xargs kill -9 2>/dev/null || echo "No process found on port 3000"
+	@lsof -ti:$${PORTFOLIO_PORT:-$(PORTFOLIO_PORT)} | xargs kill -9 2>/dev/null || echo "No process found on frontend port"
 
 .DEFAULT_GOAL := help

@@ -3,7 +3,7 @@ name: portfolio-stack
 services:
   web:
     build:
-      context: ${PORTFOLIO_CONTEXT:-.}
+      context: ${PORTFOLIO_CONTEXT:-./frontend}
       dockerfile: ${PORTFOLIO_DOCKERFILE:-Dockerfile}
       args:
         NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
@@ -17,7 +17,7 @@ services:
 
   calendar-api:
     build:
-      context: ${CALENDAR_CONTEXT:-./calendar}
+      context: ${CALENDAR_CONTEXT:-./backend}
       dockerfile: ${CALENDAR_DOCKERFILE:-Dockerfile}
     command: >
       sh -c "rm -f /app/db.sqlite3 &&

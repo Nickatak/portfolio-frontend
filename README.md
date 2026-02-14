@@ -2,15 +2,15 @@
 
 This repository now contains both apps that power the portfolio stack:
 
-- Frontend: Next.js app at repo root (`/`)
-- Backend: Django calendar API at `calendar/`
+- Frontend: Next.js app at `frontend/`
+- Backend: Django calendar API at `backend/`
 
 The previous standalone repos (`calendar`, `portfolio_orchestration`) were merged into this one.
 
 ## Layout
 
-- `src/` - Next.js frontend source
-- `calendar/` - Django backend source
+- `frontend/` - Next.js frontend app
+- `backend/` - Django backend app
 - `docker-compose.yml` - full-stack compose definition
 - `.env.example` - shared root env template for local + compose
 - `Makefile` - root commands for frontend, backend, and full stack
@@ -74,10 +74,16 @@ Commonly edited values:
 - `NEXT_PUBLIC_CONTACT_EMAIL`
 - `PORTFOLIO_PORT`
 - `CALENDAR_API_PORT`
+- `PORTFOLIO_CONTEXT` (default `./frontend`)
+- `CALENDAR_CONTEXT` (default `./backend`)
 
 Backend-specific vars are also in root `.env` (`DEBUG`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, etc.) and are passed when running backend via root Makefile.
 
 ## App-Specific Notes
 
-- Frontend details: see source + scripts in root.
-- Backend details: see `calendar/README.md`.
+- Frontend details: see `frontend/`.
+- Backend details: see `backend/README.md`.
+
+## Architecture Decisions
+
+- `docs/adr/0001-monorepo-adoption.md` - why this project moved from multi-repo orchestration to a monorepo.

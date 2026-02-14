@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/frontend/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -15,10 +16,13 @@
 
 # next.js
 /.next/
+/frontend/.next/
 /out/
+/frontend/out/
 
 # production
 /build
+/frontend/build
 
 # misc
 .DS_Store
@@ -35,12 +39,13 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
+!**/.env.example
 
 # data files (keep examples in repo, ignore user-specific data)
-/src/data/portfolio.json
-/src/data/social.json
-!src/data/portfolio.example.json
-!src/data/social.example.json
+/frontend/src/data/portfolio.json
+/frontend/src/data/social.json
+!frontend/src/data/portfolio.example.json
+!frontend/src/data/social.example.json
 
 # vercel
 .vercel
@@ -48,3 +53,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+frontend/next-env.d.ts
