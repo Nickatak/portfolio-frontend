@@ -2,6 +2,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import ProjectCard from '@/components/ProjectCard';
 import SkillsPreview from '@/components/SkillsPreview';
+import { siteConfig } from '@/config/site';
 import data from '@/data/portfolio.json';
 
 export const metadata = {
@@ -24,7 +25,7 @@ export default function Home() {
             </h1>
             
               <p className="text-lg md:text-xl text-zinc-700 dark:text-zinc-300 max-w-2xl leading-relaxed mb-8">
-              Hi! I'm Nick, I'm a full-stack developer crafting modern web applications and automation tools with various combinations of tech stacks. I create performant, maintainable, accessible, and visually stunning digital products.
+              Hi! I'm {siteConfig.displayName}, I'm a full-stack developer crafting modern web applications and automation tools with various combinations of tech stacks. I create performant, maintainable, accessible, and visually stunning digital products.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">

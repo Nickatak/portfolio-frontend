@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { siteConfig } from '@/config/site';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,7 +14,7 @@ export default function Navigation() {
           href="/"
           className="text-2xl font-bold tracking-tight"
         >
-          <span className="bg-gradient-text">Nick</span>
+          <span className="bg-gradient-text">{siteConfig.displayName}</span>
         </Link>
 
         {/* Mobile menu button */}

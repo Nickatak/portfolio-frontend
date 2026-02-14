@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import social from '@/data/social.json';
+import { siteConfig, siteContactMailto } from '@/config/site';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -9,7 +10,7 @@ export default function Footer() {
       <div className="max-w-5xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div>
-            <h3 className="font-bold text-lg mb-4 bg-gradient-text">Nick</h3>
+            <h3 className="font-bold text-lg mb-4 bg-gradient-text">{siteConfig.displayName}</h3>
             <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
               Creating beautiful digital experiences with modern web technologies.
             </p>
@@ -40,7 +41,7 @@ export default function Footer() {
           
           <div>
             <h4 className="font-semibold text-zinc-900 dark:text-white mb-4 text-sm uppercase tracking-wide">Contact</h4>
-            <a href="mailto:hello@example.com" className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-lg">
+            <a href={siteContactMailto} className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-lg">
               Get in Touch
             </a>
           </div>
@@ -48,7 +49,7 @@ export default function Footer() {
         
         <div className="border-t border-zinc-200/50 dark:border-zinc-800/50 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-zinc-700 dark:text-zinc-300">
           <p>
-            © {currentYear} Nick's Portfolio. All rights reserved.
+            © {currentYear} {siteConfig.displayName}'s Portfolio. All rights reserved.
           </p>
           <p>
             Designed & built with <span className="text-pink-600 dark:text-pink-400">♡</span> using Next.js & Tailwind CSS

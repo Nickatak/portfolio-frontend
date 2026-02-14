@@ -83,6 +83,8 @@ src/
    **Required variables:**
    - `NEXT_PUBLIC_GOOGLE_CLIENT_ID` - Get from [Google Cloud Console](https://console.cloud.google.com/)
    - `NEXT_PUBLIC_API_BASE_URL` - Calendar backend base URL (default local dev: `http://localhost:8000`)
+   - `NEXT_PUBLIC_DISPLAY_NAME` - Name shown in header/footer/hero
+   - `NEXT_PUBLIC_CONTACT_EMAIL` - Email used for contact CTA (`mailto:`)
 
 4. Set up portfolio data files:
    ```bash
