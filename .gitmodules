@@ -4,6 +4,3 @@
 [submodule "contracts/notifier"]
 	path = contracts/notifier
 	url = git@github.com:Nickatak/portfolio-notifier-contracts.git
-[submodule "backend"]
-	path = backend
-	url = git@github.com:Nickatak/portfolio-calendar.git

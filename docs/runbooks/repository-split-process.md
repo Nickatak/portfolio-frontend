@@ -2,8 +2,8 @@
 
 ## Objective
 
-Split shared concerns out of the app monorepo into dedicated repository
-boundaries while preserving local development flow.
+Split shared concerns out of the app repo into dedicated repository boundaries
+while preserving local development flow.
 
 ## Scope
 
@@ -11,6 +11,9 @@ This runbook covers:
 
 - Messaging infra split (`infra/messaging` -> `portfolio-infra-messaging`)
 - Contract split (`contracts/notifier` -> `portfolio-notifier-contracts`)
+
+Note: backend services now live in separate repositories (`portfolio-calendar`,
+`portfolio-bff`). This runbook focuses on infra/contracts only.
 
 ## Preconditions
 
@@ -24,7 +27,7 @@ This runbook covers:
 
 Define ownership before moving files.
 
-- App runtime: `frontend/`, `backend/`, root app compose
+- Frontend UI: `frontend/`
 - Messaging infra: Kafka + topic bootstrap definitions
 - Contracts: event schemas and compatibility docs
 
@@ -36,17 +39,9 @@ Move or create artifacts:
 - `contracts/notifier/events/*.schema.json`
 - Boundary README files in each directory
 
-## Step 3: Preserve Dev Workflow with Compose Layering
+## Step 3: Preserve Dev Workflow
 
-Ensure merged compose behavior remains one command:
-
-- Base app compose: `docker-compose.yml`
-- Messaging compose: `infra/messaging/docker-compose.yml`
-- `Makefile` composes both for `make up`
-
-Provide app-only fallback command:
-
-- `make up-core`
+Ensure the frontend workflow remains stable and document any compose changes.
 
 ## Step 4: Document Structure and Decision Rationale
 
@@ -60,10 +55,8 @@ Update docs:
 
 Minimum checks:
 
-- Compose config renders with merged files:
-  - `make config`
-- Backend tests still pass:
-  - `cd backend && .venv/bin/python manage.py test -v 0`
+- `make dev-config` renders compose config
+- Frontend builds successfully
 
 ## Step 6: Sync Boundary Directories to Dedicated Repositories
 
@@ -109,7 +102,6 @@ git submodule update --init --recursive
 ## Post-Split Governance
 
 - Treat contracts as versioned interfaces.
-- Keep app producer behavior aligned with schema updates.
 - Keep infra changes isolated from app runtime changes unless interface changes require coordination.
 
 ## Rollback Strategy

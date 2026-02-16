@@ -8,10 +8,10 @@ It currently owns:
 - `frontend/` (Next.js web app)
 - app orchestration (`docker-compose.yml`, `Makefile`, `.env.example`)
 
-The calendar API now lives in a dedicated repo and is referenced here as a
-submodule:
+Backend services now live in dedicated repositories:
 
-- `backend/` -> `portfolio-calendar`
+- `portfolio-calendar` (calendar API producer)
+- `portfolio-bff` (content/dashboard BFF)
 
 It also references two dedicated boundary repos as submodules:
 
@@ -32,6 +32,7 @@ now source-of-truth in dedicated repos.
 ## Ecosystem Repositories
 
 - `portfolio` (this repo): product code and primary local workflow
+- `portfolio-bff`: content + dashboard backend for the portfolio UI
 - `portfolio-calendar`: Django calendar API producer
 - `portfolio-infra-messaging`: Kafka broker + topic bootstrap definitions
 - `portfolio-notifier-contracts`: versioned event contract schemas
@@ -44,6 +45,9 @@ User Browser
     |
     v
 frontend (portfolio/frontend)
+    |
+    v
+portfolio-bff (content + dashboard API)
     |
     v
 calendar-api producer (portfolio-calendar)
@@ -64,7 +68,8 @@ portfolio-notifier-contracts
 | Change Goal | Primary Repo | Also Usually Update | Why |
 | --- | --- | --- | --- |
 | UI, pages, copy, frontend behavior | `portfolio` | None | Product UI lives in `frontend/` |
-| API logic, booking rules, producer behavior | `portfolio-calendar` | `portfolio-notifier-contracts` when payload shape changes | Producer implementation is in `backend/` submodule |
+| Content + dashboard backend | `portfolio-bff` | None | BFF owns content storage and admin UX |
+| API logic, booking rules, producer behavior | `portfolio-calendar` | `portfolio-notifier-contracts` when payload shape changes | Producer implementation is in `portfolio-calendar` |
 | Kafka broker settings, topic bootstrap, messaging compose | `portfolio-infra-messaging` | `portfolio` (submodule pointer update) | Infra source-of-truth is externalized |
 | Event schema fields/validation semantics | `portfolio-notifier-contracts` | `portfolio` and `notifier_microservice` | Contracts drive producer/consumer compatibility |
 | Notification delivery/runtime worker behavior | `notifier_microservice` | `portfolio-notifier-contracts` when schema changes | Consumer logic is outside product repo |
@@ -79,15 +84,14 @@ portfolio-notifier-contracts
 ## Layout
 
 - `frontend/` - Next.js app
-- `backend/` - submodule to `portfolio-calendar`
-- `docker-compose.yml` - app-layer compose (`web` + `calendar-api`)
+- `docker-compose.yml` - frontend-only compose (`web`)
 - `infra/messaging/` - submodule to `portfolio-infra-messaging`
 - `contracts/notifier/` - submodule to `portfolio-notifier-contracts`
 - `docs/` - ADRs, architecture docs, and runbooks
 
 ## Quick Start
 
-1. Clone and initialize submodules:
+1. Clone and initialize submodules (optional for frontend-only work):
    ```bash
    git submodule update --init --recursive
    ```
@@ -109,31 +113,19 @@ Install dependencies:
 make local-install
 ```
 
-Run both apps together:
+Run the frontend:
 ```bash
 make local-up
 ```
 
-Or run separately:
-
-Terminal 1:
-```bash
-make local-run-backend
-```
-
-Terminal 2:
+Or run directly:
 ```bash
 make local-run-frontend
 ```
 
 Endpoints:
 - Frontend: `http://localhost:3000`
-- Backend: `http://localhost:8000`
-
-Seed local development data:
-```bash
-make local-seed
-```
+- Backend: run from `portfolio-calendar` or `portfolio-bff` as needed
 
 Reset local DB (manual):
 ```bash
@@ -149,11 +141,6 @@ Full stack (app + messaging infra):
 make dev-up
 ```
 
-App-only stack (no Kafka infra):
-```bash
-make dev-up-core
-```
-
 Other compose operations:
 ```bash
 make dev-build
@@ -161,13 +148,7 @@ make dev-down
 make dev-logs
 make dev-ps
 make dev-config
-make dev-seed
 ```
-
-`make dev-up` composes:
-
-- `docker-compose.yml`
-- `infra/messaging/docker-compose.yml`
 
 Legacy aliases still work (`make up`, `make down`, etc.) and map to `dev-*` targets.
 
@@ -183,11 +164,10 @@ This repo uses a single runtime env file at `.env` for local and Docker flows.
 ## Compose Layout
 
 - `docker-compose.yml`
-- `infra/messaging/docker-compose.yml`
 
 ## Environment Variables
 
-Root `.env` drives frontend and backend runtime values.
+Root `.env` drives frontend runtime values.
 
 Frequently edited:
 
@@ -196,20 +176,13 @@ Frequently edited:
 - `NEXT_PUBLIC_DISPLAY_NAME`
 - `NEXT_PUBLIC_CONTACT_EMAIL`
 - `PORTFOLIO_PORT`
-- `CALENDAR_API_PORT`
-- `KAFKA_PRODUCER_ENABLED`
-- `KAFKA_BOOTSTRAP_SERVERS`
-- `KAFKA_BOOTSTRAP_SERVERS_DOCKER`
-- `KAFKA_TOPIC_APPOINTMENTS_CREATED`
-- `KAFKA_TOPIC_APPOINTMENTS_CREATED_DLQ`
 
 See `.env.example` for full defaults and comments.
 
 ## Submodules
 
-This repo expects all submodules to be available:
+This repo expects the following submodules (optional for frontend-only work):
 
-- `backend` (calendar API producer)
 - `infra/messaging` (messaging compose/services)
 - `contracts/notifier` (event schema definitions)
 
@@ -225,8 +198,8 @@ git submodule update --remote --merge
 
 ## App Documentation
 
-- Backend details: `backend/README.md`
 - Frontend details: `frontend/`
+- Backend services: `portfolio-bff`, `portfolio-calendar`
 
 ## Architecture and Decisions
 
