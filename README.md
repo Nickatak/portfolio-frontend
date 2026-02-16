@@ -151,6 +151,16 @@ Frontend container:
 make docker-up
 ```
 
+To connect the frontend container to the BFF (also running in Docker), start the
+BFF compose file first:
+```bash
+cd ../portfolio-bff
+docker compose up -d --build
+```
+
+The frontend container resolves the BFF as `http://portfolio-bff:8000` on the
+shared `portfolio_net` network.
+
 Other compose operations:
 ```bash
 make docker-build
