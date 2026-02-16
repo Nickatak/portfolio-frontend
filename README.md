@@ -99,67 +99,50 @@ portfolio-notifier-contracts
    ```bash
    make env-init
    ```
-3. Prepare frontend local data files:
+3. Install dependencies:
    ```bash
-   make prepare-portfolio-data
+   make install
    ```
+4. Run the frontend:
+   ```bash
+   make dev
+   ```
+
+`make install` and `make dev` will copy `frontend/src/data/portfolio.example.json`
+and `frontend/src/data/social.example.json` into the `*.json` files if they are
+missing.
 
 ## Local Development (App Only, No Docker)
 
-Uses `.env`.
-
-Install dependencies:
-```bash
-make local-install
-```
-
-Run the frontend:
-```bash
-make local-up
-```
-
-Or run directly:
-```bash
-make local-run-frontend
-```
+Use `.env` and run `make dev`.
 
 Endpoints:
 - Frontend: `http://localhost:3000`
 - Backend: run from `portfolio-calendar` or `portfolio-bff` as needed
 
-Reset local DB (manual):
-```bash
-make local-reset-db
-```
-
 ## Docker Workflows
 
-### Dev Docker (`.env`)
+### Docker (`.env`)
 
-Full stack (app + messaging infra):
+Frontend container:
 ```bash
-make dev-up
+make docker-up
 ```
 
 Other compose operations:
 ```bash
-make dev-build
-make dev-down
-make dev-logs
-make dev-ps
-make dev-config
+make docker-build
+make docker-down
+make docker-logs
 ```
-
-Legacy aliases still work (`make up`, `make down`, etc.) and map to `dev-*` targets.
 
 ## Environment Configuration
 
 This repo uses a single runtime env file at `.env` for local and Docker flows.
 
 - Run `make env-init` to create `.env` from `.env.example` if missing.
-- Run `make env-validate` to verify required keys are present and non-empty.
 - Update `.env` values for your machine/runtime.
-- `make dev-*` commands provide Docker-based local development workflows.
+- `make docker-*` commands provide Docker-based workflows.
 
 ## Compose Layout
 

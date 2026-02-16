@@ -55,8 +55,8 @@ Update docs:
 
 Minimum checks:
 
-- `make dev-config` renders compose config
-- Frontend builds successfully
+- `docker compose --env-file .env -f docker-compose.yml config` renders compose config
+- `make build` succeeds
 
 ## Step 6: Sync Boundary Directories to Dedicated Repositories
 
