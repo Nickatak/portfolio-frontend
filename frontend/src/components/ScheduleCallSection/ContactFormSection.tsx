@@ -100,14 +100,14 @@ export default function ContactFormSection({
           phone,
           timezone,
         },
-        timeslot: {
-          topic: topic,
+        appointment: {
+          topic,
           start_time: startTime.toISOString(),
           end_time: endTime.toISOString(),
         },
       };
 
-      const response = await fetch(`${API_BASE_URL}/api/timeslots`, {
+      const response = await fetch(`${API_BASE_URL}/api/appointments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -28,7 +28,7 @@ Content and dashboard backend (BFF).
 Calendar API producer for appointments.
 
 - Owns:
-  - Booking rules and timeslot API
+  - Booking intake API (C# Minimal API)
   - Kafka producer logic
 - May include reference submodules:
   - `infra/messaging/` (submodule to `portfolio-infra-messaging`)

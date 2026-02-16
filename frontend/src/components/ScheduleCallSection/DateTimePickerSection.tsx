@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { formatDateDisplay, convertPSTToLocal, extractTimeFromISO } from './utils';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+import { formatDateDisplay, convertPSTToLocal } from './utils';
 
 interface TimeSlot {
   time: string;
@@ -27,8 +25,6 @@ export default function DateTimePickerSection({
   bookedTime,
 }: DateTimePickerSectionProps) {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
-  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
-  const [previouslyBookedTimes, setPreviouslyBookedTimes] = useState<any[]>([]);
 
   // Generate initial time slots (without availability data)
   const generateInitialTimeSlots = (): TimeSlot[] => {
@@ -47,56 +43,32 @@ export default function DateTimePickerSection({
     return slots;
   };
 
-  // Update availability based on booked times
-  const updateSlotAvailability = (slots: TimeSlot[], bookedTimes: any[], justBookedTime: string | null) => {
+  // Update availability based on the current in-session booking
+  const updateSlotAvailability = (slots: TimeSlot[], justBookedTime: string | null) => {
     return slots.map((slot) => {
-      const isBooked = bookedTimes.some((bookedTime) => {
-        const timeFromDatetime = extractTimeFromISO(bookedTime.datetime);
-        return timeFromDatetime === slot.pstTime;
-      });
       const isJustBooked = justBookedTime === slot.time;
       return {
         ...slot,
-        available: !isBooked && !isJustBooked,
+        available: !isJustBooked,
       };
     });
   };
 
-  // Fetch booked timeslots for selected date
+  // Initialize available slots when a date is selected (stateless API)
   useEffect(() => {
     if (!selectedDate) {
       setTimeSlots([]);
-      setPreviouslyBookedTimes([]);
       return;
     }
 
-    // Initialize slots on date change
-    setTimeSlots(generateInitialTimeSlots());
-    setIsLoadingSlots(true);
-
-    const year = selectedDate.getFullYear();
-    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-    const day = String(selectedDate.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`; // Format as YYYY-MM-DD in local timezone
-    fetch(`${API_BASE_URL}/api/timeslots/by-day?date=${formattedDate}`)
-      .then((res) => res.json())
-      .then((bookedTimes) => {
-        console.log(bookedTimes);
-        setPreviouslyBookedTimes(bookedTimes);
-        setTimeSlots((prevSlots) => updateSlotAvailability(prevSlots, bookedTimes, bookedTime ?? null));
-      })
-      .catch((error) => {
-        console.error('Error fetching timeslots:', error);
-      })
-      .finally(() => {
-        setIsLoadingSlots(false);
-      });
+    const initialSlots = generateInitialTimeSlots();
+    setTimeSlots(updateSlotAvailability(initialSlots, bookedTime ?? null));
   }, [selectedDate]);
 
-  // Update availability when bookedTime changes (preserve previously booked times)
+  // Update availability when bookedTime changes
   useEffect(() => {
-    setTimeSlots((prevSlots) => updateSlotAvailability(prevSlots, previouslyBookedTimes, bookedTime ?? null));
-  }, [bookedTime, previouslyBookedTimes]);
+    setTimeSlots((prevSlots) => updateSlotAvailability(prevSlots, bookedTime ?? null));
+  }, [bookedTime]);
   const today = new Date();
   const nextDays = Array.from({ length: 14 }, (_, i) => {
     const date = new Date(today);

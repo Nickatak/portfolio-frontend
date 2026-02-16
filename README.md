@@ -40,7 +40,7 @@ System-wide architecture decisions and rationale live in:
 
 - `portfolio` (this repo): product code and primary local workflow
 - `portfolio-bff`: content + dashboard backend for the portfolio UI
-- `portfolio-calendar`: Django calendar API producer
+- `portfolio-calendar`: C# minimal calendar API producer
 - `portfolio-infra-messaging`: Kafka broker + topic bootstrap definitions
 - `portfolio-notifier-contracts`: versioned event contract schemas
 - `notifier_microservice` (separate repo): notifier consumer/worker service
