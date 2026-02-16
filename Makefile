@@ -1,47 +1,40 @@
-VENV ?= .venv
 FRONTEND_DIR ?= frontend
-BACKEND_DIR ?= backend
 PORTFOLIO_PORT ?= 3000
-CALENDAR_API_PORT ?= 8000
+
+ENV_FILE ?= .env
+
 COMPOSE_BASE_FILE ?= docker-compose.yml
-COMPOSE_MESSAGING_FILE ?= infra/messaging/docker-compose.yml
-COMPOSE_FILES ?= -f $(COMPOSE_BASE_FILE) -f $(COMPOSE_MESSAGING_FILE)
-COMPOSE ?= docker compose $(COMPOSE_FILES)
+DOCKER_COMPOSE ?= docker compose --env-file $(ENV_FILE) -f $(COMPOSE_BASE_FILE)
 
 .PHONY: help \
-	prepare-portfolio-data \
-	frontend-setup frontend frontend-build frontend-start \
-	backend-setup backend backend-test backend-shell backend-migrate \
-	up up-core compose-build down logs ps config \
-	install run build start lint lint-fix clean clean-all kill
+	env-init prepare-portfolio-data \
+	install dev build start lint clean \
+	docker-build docker-up docker-down docker-logs
 
 help:
-	@echo "Portfolio Monorepo"
+	@echo "Portfolio Frontend"
 	@echo "================="
 	@echo ""
-	@echo "Frontend (Next.js):"
-	@echo "  make frontend-setup   Install frontend dependencies ($(FRONTEND_DIR)/)"
-	@echo "  make frontend         Run frontend dev server (localhost:$(PORTFOLIO_PORT))"
-	@echo "  make frontend-build   Build frontend ($(FRONTEND_DIR)/)"
-	@echo "  make frontend-start   Start production frontend ($(FRONTEND_DIR)/)"
+	@echo "Environment file:"
+	@echo "  Active: $(ENV_FILE)"
+	@echo "  make env-init          Create $(ENV_FILE) from .env.example if missing"
 	@echo ""
-	@echo "Backend (Django):"
-	@echo "  make backend-setup    Create venv, install deps, and migrate ($(BACKEND_DIR)/)"
-	@echo "  make backend          Run backend dev server (localhost:$(CALENDAR_API_PORT))"
-	@echo "  make backend-test     Run backend tests"
-	@echo "  make backend-shell    Open Django shell"
-	@echo "  make backend-migrate  Apply migrations"
+	@echo "Local (no Docker):"
+	@echo "  make install           Install frontend dependencies"
+	@echo "  make dev               Run Next.js dev server"
+	@echo "  make build             Build frontend assets"
+	@echo "  make start             Start production server"
+	@echo "  make lint              Lint frontend"
+	@echo "  make clean             Clean build/cache artifacts"
 	@echo ""
-	@echo "Full Stack (Docker Compose):"
-	@echo "  make up               Build and run frontend + backend + messaging infra"
-	@echo "  make up-core          Build and run frontend + backend only"
-	@echo "  make compose-build    Build compose images"
-	@echo "  make down             Stop and remove containers"
-	@echo "  make logs             Follow compose logs"
-	@echo "  make ps               Show compose services"
-	@echo "  make config           Render merged compose config"
-	@echo ""
-	@echo "Legacy aliases (frontend): install run build start lint lint-fix clean clean-all kill"
+	@echo "Docker (uses $(ENV_FILE)):"
+	@echo "  make docker-build      Build frontend image"
+	@echo "  make docker-up         Run frontend container"
+	@echo "  make docker-down       Stop dev stack"
+	@echo "  make docker-logs       Follow dev logs"
+
+env-init:
+	@if [ ! -f $(ENV_FILE) ]; then cp .env.example $(ENV_FILE); echo "Created $(ENV_FILE) from .env.example"; fi
 
 prepare-portfolio-data:
 	@if [ ! -f $(FRONTEND_DIR)/src/data/portfolio.json ] && [ -f $(FRONTEND_DIR)/src/data/portfolio.example.json ]; then \
@@ -51,11 +44,11 @@ prepare-portfolio-data:
 		cp $(FRONTEND_DIR)/src/data/social.example.json $(FRONTEND_DIR)/src/data/social.json; \
 	fi
 
-frontend-setup: prepare-portfolio-data
+install: prepare-portfolio-data
 	cd $(FRONTEND_DIR) && npm ci
 
-frontend: prepare-portfolio-data
-	@set -a; [ -f .env ] && . ./.env; set +a; \
+dev: prepare-portfolio-data
+	@set -a; [ -f $(ENV_FILE) ] && . ./$(ENV_FILE); set +a; \
 	cd $(FRONTEND_DIR); \
 	NEXT_PUBLIC_API_BASE_URL=$${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000} \
 	NEXT_PUBLIC_GOOGLE_CLIENT_ID=$${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-} \
@@ -63,75 +56,30 @@ frontend: prepare-portfolio-data
 	NEXT_PUBLIC_CONTACT_EMAIL=$${NEXT_PUBLIC_CONTACT_EMAIL:-hello@example.com} \
 	npm run dev -- --hostname 0.0.0.0 --port $${PORTFOLIO_PORT:-$(PORTFOLIO_PORT)}
 
-frontend-build: prepare-portfolio-data
+build: prepare-portfolio-data
 	cd $(FRONTEND_DIR) && npm run build
 
-frontend-start:
+start:
 	cd $(FRONTEND_DIR) && npm run start
-
-backend-setup:
-	@set -a; [ -f .env ] && . ./.env; set +a; \
-	cd $(BACKEND_DIR); \
-	[ -x $(VENV)/bin/python ] || python3 -m venv $(VENV); \
-	$(MAKE) install migrate
-
-backend:
-	@set -a; [ -f .env ] && . ./.env; set +a; \
-	$(MAKE) -C $(BACKEND_DIR) runserver
-
-backend-test:
-	@set -a; [ -f .env ] && . ./.env; set +a; \
-	$(MAKE) -C $(BACKEND_DIR) test
-
-backend-shell:
-	@set -a; [ -f .env ] && . ./.env; set +a; \
-	$(MAKE) -C $(BACKEND_DIR) shell
-
-backend-migrate:
-	@set -a; [ -f .env ] && . ./.env; set +a; \
-	$(MAKE) -C $(BACKEND_DIR) migrate
-
-up: prepare-portfolio-data
-	$(COMPOSE) up --build
-
-up-core: prepare-portfolio-data
-	docker compose -f $(COMPOSE_BASE_FILE) up --build
-
-compose-build: prepare-portfolio-data
-	$(COMPOSE) build
-
-down:
-	$(COMPOSE) down --remove-orphans
-
-logs:
-	$(COMPOSE) logs -f --tail=200
-
-ps:
-	$(COMPOSE) ps
-
-config:
-	$(COMPOSE) config
-
-# ---------- Legacy frontend aliases ----------
-install: frontend-setup
-run: frontend
-build: frontend-build
-start: frontend-start
 
 lint:
 	cd $(FRONTEND_DIR) && npm run lint
-
-lint-fix:
-	cd $(FRONTEND_DIR) && npm run lint -- --fix
 
 clean:
 	rm -rf $(FRONTEND_DIR)/.next $(FRONTEND_DIR)/dist
 	find $(FRONTEND_DIR) -type d -name ".turbo" -exec rm -rf {} + 2>/dev/null || true
 
-clean-all: clean
-	rm -rf $(FRONTEND_DIR)/node_modules
+# ---------- Dev Docker ----------
+docker-build: prepare-portfolio-data
+	$(DOCKER_COMPOSE) build
 
-kill:
-	@lsof -ti:$${PORTFOLIO_PORT:-$(PORTFOLIO_PORT)} | xargs kill -9 2>/dev/null || echo "No process found on frontend port"
+docker-up: prepare-portfolio-data
+	$(DOCKER_COMPOSE) up --build
+
+docker-down:
+	$(DOCKER_COMPOSE) down --remove-orphans
+
+docker-logs:
+	$(DOCKER_COMPOSE) logs -f --tail=200
 
 .DEFAULT_GOAL := help

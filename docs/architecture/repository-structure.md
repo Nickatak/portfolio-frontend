@@ -3,40 +3,55 @@
 ## Purpose
 
 Define the current architecture boundaries across the portfolio ecosystem and
-document where each concern should live.
+where each concern should live.
 
 ## Repositories
 
 ### 1. `portfolio` (this repository)
 
-Primary product repo for portfolio-facing apps and local orchestration.
+Frontend-only product repo for the portfolio UI and local frontend workflows.
 
 - Owns:
   - `frontend/` (Next.js web app)
-  - `backend/` (Django calendar API producer)
-  - Root app orchestration (`docker-compose.yml`, `Makefile`)
-- Contains submodule boundaries:
+  - Frontend compose (`docker-compose.yml`, `Makefile`)
+- May include reference submodules:
   - `infra/messaging/` (submodule to `portfolio-infra-messaging`)
   - `contracts/notifier/` (submodule to `portfolio-notifier-contracts`)
 
-### 2. `portfolio-infra-messaging`
+### 2. `portfolio-bff`
 
-Target home for shared Kafka runtime infrastructure.
+Content and dashboard backend (BFF).
 
 - Owns:
-  - Kafka broker compose definitions
+  - Content models and admin workflows
+  - Public API for frontend content
+
+### 3. `portfolio-calendar`
+
+Calendar API producer for appointments.
+
+- Owns:
+  - Booking rules and timeslot API
+  - Kafka producer logic
+
+### 4. `portfolio-infra-messaging`
+
+Shared Kafka runtime infrastructure.
+
+- Owns:
+  - Broker compose definitions
   - Topic bootstrap/init logic
   - Messaging-specific operational docs
 
-### 3. `portfolio-notifier-contracts`
+### 5. `portfolio-notifier-contracts`
 
-Target home for notifier event contracts.
+Event contract source of truth.
 
 - Owns:
   - Versioned JSON schemas for notifier events
   - Compatibility and contract release guidance
 
-### 4. `notifier_microservice` (existing repo, future rename candidate)
+### 6. `notifier_microservice` (existing repo, future rename candidate)
 
 Consumer/worker implementation for notification processing.
 
@@ -46,28 +61,22 @@ Consumer/worker implementation for notification processing.
 
 ## Boundary Rules
 
-- Product/runtime code stays in `portfolio` app directories (`frontend/`, `backend/`).
-- Messaging runtime infrastructure is treated as a separate boundary (`infra/messaging/`).
-- Event contracts are treated as integration artifacts, not implicit code details.
-- App orchestration and messaging orchestration are layered and composable.
+- Frontend UI lives in `portfolio`.
+- Content management and dashboard features live in `portfolio-bff`.
+- Scheduling/booking logic lives in `portfolio-calendar`.
+- Messaging infra and contracts remain dedicated boundaries.
 
-## Compose Layering Model
+## Compose Model
 
-The local full stack is composed from two files:
+This repo’s compose file is frontend-only:
 
-1. `docker-compose.yml` (app services)
-2. `infra/messaging/docker-compose.yml` (messaging services)
+- `docker-compose.yml` (frontend service)
 
-`Makefile` binds both by default so `make up` preserves one-command startup.
+Messaging compose lives in `portfolio-infra-messaging`.
 
 ## Contract Source of Truth
 
-Current source files in this repo:
-
-- `contracts/notifier/events/appointments.created.schema.json`
-- `contracts/notifier/events/appointments.created.dlq.schema.json`
-
-Target canonical location:
+Canonical location:
 
 - `portfolio-notifier-contracts`
 
@@ -76,18 +85,9 @@ Target canonical location:
 ```text
 portfolio/
 ├── frontend/                         # product web app
-├── backend/                          # product API + producer logic
-├── docker-compose.yml                # app-only compose layer
-├── infra/
-│   └── messaging/
-│       ├── docker-compose.yml
-│       └── README.md
-├── contracts/
-│   └── notifier/
-│       ├── README.md
-│       └── events/
-│           ├── appointments.created.schema.json
-│           └── appointments.created.dlq.schema.json
+├── docker-compose.yml                # frontend-only compose
+├── infra/                            # optional submodule (messaging)
+├── contracts/                        # optional submodule (schemas)
 └── docs/
     ├── adr/
     ├── architecture/

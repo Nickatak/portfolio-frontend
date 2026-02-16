@@ -10,31 +10,5 @@ services:
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
         NEXT_PUBLIC_DISPLAY_NAME: ${NEXT_PUBLIC_DISPLAY_NAME:-Your Name}
         NEXT_PUBLIC_CONTACT_EMAIL: ${NEXT_PUBLIC_CONTACT_EMAIL:-hello@example.com}
-    depends_on:
-      - calendar-api
     ports:
       - "${PORTFOLIO_PORT:-3000}:3000"
-
-  calendar-api:
-    build:
-      context: ${CALENDAR_CONTEXT:-./backend}
-      dockerfile: ${CALENDAR_DOCKERFILE:-Dockerfile}
-    command: >
-      sh -c "rm -f /app/db.sqlite3 &&
-             ln -s /app/persist/db.sqlite3 /app/db.sqlite3 &&
-             python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
-    environment:
-      KAFKA_PRODUCER_ENABLED: ${KAFKA_PRODUCER_ENABLED:-false}
-      KAFKA_NOTIFY_EMAIL_DEFAULT: ${KAFKA_NOTIFY_EMAIL_DEFAULT:-true}
-      KAFKA_NOTIFY_SMS_DEFAULT: ${KAFKA_NOTIFY_SMS_DEFAULT:-false}
-      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-kafka:19092}
-      KAFKA_TOPIC_APPOINTMENTS_CREATED: ${KAFKA_TOPIC_APPOINTMENTS_CREATED:-appointments.created}
-    volumes:
-      - calendar_sqlite_data:/app/persist
-    ports:
-      - "${CALENDAR_API_PORT:-8000}:8000"
-
-volumes:
-  calendar_sqlite_data:
-    name: portfolio_calendar_sqlite_data
