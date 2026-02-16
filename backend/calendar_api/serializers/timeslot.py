@@ -10,8 +10,9 @@ from ..services.booking_policy import (
 
 
 class TimeSlotSerializer(serializers.ModelSerializer):
-    end_time = serializers.SerializerMethodField()
-    datetime = serializers.DateTimeField(source='time')
+    datetime = serializers.DateTimeField(source='time', required=False)
+    start_time = serializers.DateTimeField(source='time', required=False)
+    end_time = serializers.DateTimeField(required=False, write_only=True)
 
     class Meta:
         model = TimeSlot
@@ -19,6 +20,7 @@ class TimeSlotSerializer(serializers.ModelSerializer):
             'id',
             'topic',
             'datetime',
+            'start_time',
             'duration_minutes',
             'end_time',
             'contact',
@@ -27,7 +29,7 @@ class TimeSlotSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'end_time']
+        read_only_fields = ['id', 'created_at', 'updated_at']
         extra_kwargs = {
             'contact': {'required': False, 'allow_null': True},
             'duration_minutes': {'required': False},
@@ -35,17 +37,15 @@ class TimeSlotSerializer(serializers.ModelSerializer):
             'is_processed': {'required': False},
         }
 
-    def get_end_time(self, obj):
-        """Calculate and return end time from time + duration_minutes."""
-        end_dt = obj._get_end_time()
-        return end_dt
-
     def to_representation(self, instance):
-        """Override to ensure datetime is shown in output."""
+        """Expose computed end_time and keep alias fields in output."""
         data = super().to_representation(instance)
+        end_dt = instance._get_end_time()
+        data['end_time'] = serializers.DateTimeField().to_representation(end_dt)
         return data
 
     def validate(self, data):
+        raw_end_dt = data.pop('end_time', None)
         start_dt = data.get('time')
         duration_minutes = data.get('duration_minutes')
 
@@ -58,8 +58,18 @@ class TimeSlotSerializer(serializers.ModelSerializer):
         if start_dt is None:
             return data
 
+        if duration_minutes is None and raw_end_dt is not None:
+            delta_seconds = (raw_end_dt - start_dt).total_seconds()
+            if delta_seconds <= 0:
+                raise serializers.ValidationError('end_time must be after start_time.')
+            if delta_seconds % 60 != 0:
+                raise serializers.ValidationError('Time range must align to whole minutes.')
+            duration_minutes = int(delta_seconds // 60)
+            data['duration_minutes'] = duration_minutes
+
         if duration_minutes is None:
             duration_minutes = 30
+            data['duration_minutes'] = duration_minutes
 
         try:
             validate_duration_minutes(duration_minutes)

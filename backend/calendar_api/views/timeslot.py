@@ -45,7 +45,11 @@ class TimeSlotViewSet(viewsets.ModelViewSet):
         Accepts contact and timeslot data together:
            {
                "contact": {"first_name": "...", "last_name": "...", "email": "..."},
-               "timeslot": {datetime: ""2026-01-27T10:00:00", topic: "..."}
+               "timeslot": {
+                   "start_time": "2026-01-27T10:00:00Z",
+                   "end_time": "2026-01-27T10:45:00Z",
+                   "topic": "..."
+               }
            }
         """
         # Check if this is a with-contact request

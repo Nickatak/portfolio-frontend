@@ -93,8 +93,8 @@ Notes:
   },
   "timeslot": {
     "topic": "Intro Call",
-    "datetime": "2026-02-20T10:00:00",
-    "duration_minutes": 30
+    "start_time": "2026-02-20T10:00:00Z",
+    "end_time": "2026-02-20T10:45:00Z"
   }
 }
 ```

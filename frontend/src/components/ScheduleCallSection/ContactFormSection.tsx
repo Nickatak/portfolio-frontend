@@ -84,8 +84,10 @@ export default function ContactFormSection({
     setIsSubmitting(true);
 
     try {
-      const dateString = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD
-      const dateTimeString = `${dateString}T${selectedTime}:00`; // YYYY-MM-DDTHH:mm:00
+      const [hourString, minuteString] = selectedTime.split(':');
+      const startTime = new Date(selectedDate);
+      startTime.setHours(Number(hourString), Number(minuteString), 0, 0);
+      const endTime = new Date(startTime.getTime() + 30 * 60 * 1000);
 
       // Get user's timezone
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -100,7 +102,8 @@ export default function ContactFormSection({
         },
         timeslot: {
           topic: topic,
-          datetime: dateTimeString,
+          start_time: startTime.toISOString(),
+          end_time: endTime.toISOString(),
         },
       };
 
