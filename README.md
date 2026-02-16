@@ -6,8 +6,12 @@ stack.
 It currently owns:
 
 - `frontend/` (Next.js web app)
-- `backend/` (Django calendar API producer)
 - app orchestration (`docker-compose.yml`, `Makefile`, `.env.example`)
+
+The calendar API now lives in a dedicated repo and is referenced here as a
+submodule:
+
+- `backend/` -> `portfolio-calendar`
 
 It also references two dedicated boundary repos as submodules:
 
@@ -28,6 +32,7 @@ now source-of-truth in dedicated repos.
 ## Ecosystem Repositories
 
 - `portfolio` (this repo): product code and primary local workflow
+- `portfolio-calendar`: Django calendar API producer
 - `portfolio-infra-messaging`: Kafka broker + topic bootstrap definitions
 - `portfolio-notifier-contracts`: versioned event contract schemas
 - `notifier_microservice` (separate repo): notifier consumer/worker service
@@ -41,7 +46,7 @@ User Browser
 frontend (portfolio/frontend)
     |
     v
-calendar-api producer (portfolio/backend)
+calendar-api producer (portfolio-calendar)
     |
     | emits appointments.created
     v
@@ -59,7 +64,7 @@ portfolio-notifier-contracts
 | Change Goal | Primary Repo | Also Usually Update | Why |
 | --- | --- | --- | --- |
 | UI, pages, copy, frontend behavior | `portfolio` | None | Product UI lives in `frontend/` |
-| API logic, booking rules, producer behavior | `portfolio` | `portfolio-notifier-contracts` when payload shape changes | Producer implementation is in `backend/` |
+| API logic, booking rules, producer behavior | `portfolio-calendar` | `portfolio-notifier-contracts` when payload shape changes | Producer implementation is in `backend/` submodule |
 | Kafka broker settings, topic bootstrap, messaging compose | `portfolio-infra-messaging` | `portfolio` (submodule pointer update) | Infra source-of-truth is externalized |
 | Event schema fields/validation semantics | `portfolio-notifier-contracts` | `portfolio` and `notifier_microservice` | Contracts drive producer/consumer compatibility |
 | Notification delivery/runtime worker behavior | `notifier_microservice` | `portfolio-notifier-contracts` when schema changes | Consumer logic is outside product repo |
@@ -74,7 +79,7 @@ portfolio-notifier-contracts
 ## Layout
 
 - `frontend/` - Next.js app
-- `backend/` - Django app
+- `backend/` - submodule to `portfolio-calendar`
 - `docker-compose.yml` - app-layer compose (`web` + `calendar-api`)
 - `infra/messaging/` - submodule to `portfolio-infra-messaging`
 - `contracts/notifier/` - submodule to `portfolio-notifier-contracts`
@@ -202,8 +207,9 @@ See `.env.example` for full defaults and comments.
 
 ## Submodules
 
-This repo expects both submodules to be available:
+This repo expects all submodules to be available:
 
+- `backend` (calendar API producer)
 - `infra/messaging` (messaging compose/services)
 - `contracts/notifier` (event schema definitions)
 
