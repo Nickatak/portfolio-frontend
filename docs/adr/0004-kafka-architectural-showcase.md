@@ -95,7 +95,7 @@ Accepted.
 
 - `appointments.created` topic publishes new appointment events from the calendar
   API when Kafka is enabled.
-- Contracts are defined in `contracts/notifier/events/` and used by producers and
+- Contracts are defined in `portfolio-calendar/contracts/notifier/events/` and used by producers and
   consumers.
 - Future consumers (e.g., dashboard) should validate against contracts and
   maintain their own read models.

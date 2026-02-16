@@ -9,8 +9,8 @@ while preserving local development flow.
 
 This runbook covers:
 
-- Messaging infra split (`infra/messaging` -> `portfolio-infra-messaging`)
-- Contract split (`contracts/notifier` -> `portfolio-notifier-contracts`)
+- Messaging infra split (`portfolio-calendar/infra/messaging` -> `portfolio-infra-messaging`)
+- Contract split (`portfolio-calendar/contracts/notifier` -> `portfolio-notifier-contracts`)
 
 Note: backend services now live in separate repositories (`portfolio-calendar`,
 `portfolio-bff`). This runbook focuses on infra/contracts only.
@@ -35,8 +35,8 @@ Define ownership before moving files.
 
 Move or create artifacts:
 
-- `infra/messaging/docker-compose.yml`
-- `contracts/notifier/events/*.schema.json`
+  - `portfolio-calendar/infra/messaging/docker-compose.yml`
+  - `portfolio-calendar/contracts/notifier/events/*.schema.json`
 - Boundary README files in each directory
 
 ## Step 3: Preserve Dev Workflow
@@ -73,8 +73,8 @@ Use one of the approaches below.
 Example commands:
 
 ```bash
-git subtree split --prefix infra/messaging -b split/infra-messaging
-git subtree split --prefix contracts/notifier -b split/notifier-contracts
+git subtree split --prefix portfolio-calendar/infra/messaging -b split/infra-messaging
+git subtree split --prefix portfolio-calendar/contracts/notifier -b split/notifier-contracts
 
 git push <portfolio-infra-messaging-remote> split/infra-messaging:main
 git push <portfolio-notifier-contracts-remote> split/notifier-contracts:main
@@ -89,8 +89,8 @@ After dedicated repositories are populated, replace in-repo copies with
 submodule references:
 
 ```bash
-git submodule add git@github.com:Nickatak/portfolio-infra-messaging.git infra/messaging
-git submodule add git@github.com:Nickatak/portfolio-notifier-contracts.git contracts/notifier
+git submodule add git@github.com:Nickatak/portfolio-infra-messaging.git portfolio-calendar/infra/messaging
+git submodule add git@github.com:Nickatak/portfolio-notifier-contracts.git portfolio-calendar/contracts/notifier
 ```
 
 Bootstrap for consumers:
