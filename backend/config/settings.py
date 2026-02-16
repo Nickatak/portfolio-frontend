@@ -118,6 +118,11 @@ REST_FRAMEWORK = {
     'FORMAT_SUFFIX_PATTERNS': False,
 }
 
+AUTHENTICATION_BACKENDS = [
+    'calendar_api.auth_backends.UsernameOrEmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = _env_list('CORS_ALLOWED_ORIGINS', [
     'http://localhost:3000',
