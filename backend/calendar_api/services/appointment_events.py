@@ -66,6 +66,10 @@ def build_timeslot_created_payload(timeslot: TimeSlot) -> dict[str, Any] | None:
     appointment: dict[str, Any] = {
         "appointment_id": f"timeslot-{timeslot.id}",
         "user_id": str(contact.id),
+        "start_time": timeslot.time.isoformat(),
+        "end_time": timeslot._get_end_time().isoformat(),
+        "duration_minutes": timeslot.duration_minutes,
+        # Backward-compatible alias retained for downstream consumers not yet migrated.
         "time": timeslot.time.isoformat(),
         "email": email,
     }
