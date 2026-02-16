@@ -1,20 +1,22 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SkillBadge from '@/components/SkillBadge';
+import { getPortfolioContent } from '@/lib/bff';
 
 export const metadata = {
   title: 'About Me | Modern Portfolio',
   description: 'Learn more about my background and skills',
 };
 
-export default function About() {
+export default async function About() {
+  const content = await getPortfolioContent();
   const frontendSkills = ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'JavaScript', 'HTML5/CSS3'];
   const backendSkills = ['Node.js', 'Express', 'Python', 'PostgreSQL', 'MongoDB', 'GraphQL'];
   const tools = ['Git', 'Docker', 'AWS', 'Vercel', 'GitHub', 'VS Code'];
 
   return (
     <>
-      <Navigation />
+      <Navigation displayName={content.site.displayName} />
       <main className="min-h-screen">
         <div className="max-w-5xl mx-auto px-6 pt-20 pb-12 md:pt-32 md:pb-20">
           {/* Header */}
@@ -127,7 +129,11 @@ export default function About() {
           </section>
         </div>
       </main>
-      <Footer />
+      <Footer
+        displayName={content.site.displayName}
+        contactEmail={content.site.contactEmail}
+        socialLinks={content.socialLinks}
+      />
     </>
   );
 }

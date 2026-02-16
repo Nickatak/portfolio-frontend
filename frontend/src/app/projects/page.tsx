@@ -1,17 +1,19 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import ProjectCard from '@/components/ProjectCard';
-import data from '@/data/portfolio.json';
+import { getPortfolioContent } from '@/lib/bff';
 
 export const metadata = {
   title: 'Demos | Modern Portfolio',
   description: 'View my latest demo applications and projects',
 };
 
-export default function Projects() {
+export default async function Projects() {
+  const content = await getPortfolioContent();
+
   return (
     <>
-      <Navigation />
+      <Navigation displayName={content.site.displayName} />
       <main className="min-h-screen">
         <div className="max-w-5xl mx-auto px-6 pt-20 pb-12 md:pt-32 md:pb-20">
           <section className="mb-16 animate-fade-in-up">
@@ -23,7 +25,7 @@ export default function Projects() {
           </section>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {data.projects.map((project) => (
+            {content.projects.map((project) => (
               <ProjectCard
                 key={project.id}
                 title={project.title}
@@ -36,7 +38,11 @@ export default function Projects() {
           </div>
         </div>
       </main>
-      <Footer />
+      <Footer
+        displayName={content.site.displayName}
+        contactEmail={content.site.contactEmail}
+        socialLinks={content.socialLinks}
+      />
     </>
   );
 }

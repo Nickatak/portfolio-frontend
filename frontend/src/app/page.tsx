@@ -2,18 +2,19 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import ProjectCard from '@/components/ProjectCard';
 import SkillsPreview from '@/components/SkillsPreview';
-import { siteConfig } from '@/config/site';
-import data from '@/data/portfolio.json';
+import { getPortfolioContent } from '@/lib/bff';
 
 export const metadata = {
   title: 'Modern Portfolio | Full Stack Developer',
   description: 'Showcase of my web development projects and skills',
 };
 
-export default function Home() {
+export default async function Home() {
+  const content = await getPortfolioContent();
+
   return (
     <>
-      <Navigation />
+      <Navigation displayName={content.site.displayName} />
       <main className="min-h-screen">
         {/* Hero Section */}
         <section className="max-w-5xl mx-auto px-6 pt-32 pb-20 md:pt-40 md:pb-32">
@@ -25,7 +26,7 @@ export default function Home() {
             </h1>
             
               <p className="text-lg md:text-xl text-zinc-700 dark:text-zinc-300 max-w-2xl leading-relaxed mb-8">
-              Hi! I'm {siteConfig.displayName}, I'm a full-stack developer crafting modern web applications and automation tools with various combinations of tech stacks. I create performant, maintainable, accessible, and visually stunning digital products.
+              Hi! I'm {content.site.displayName}, I'm a full-stack developer crafting modern web applications and automation tools with various combinations of tech stacks. I create performant, maintainable, accessible, and visually stunning digital products.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
@@ -54,7 +55,7 @@ export default function Home() {
         {/* Stats Section */}
         <section className="max-w-5xl mx-auto px-6 py-16 md:py-24">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {data.stats.map((stat, index) => (
+            {content.stats.map((stat, index) => (
               <div
                 key={index}
                 className="glass-effect p-8 rounded-xl text-center hover:bg-zinc-100/50 dark:hover:bg-zinc-900/50 transition-all duration-300 group"
@@ -77,7 +78,7 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {data.projects.slice(0, 4).map((project) => (
+            {content.projects.slice(0, 4).map((project) => (
               <ProjectCard
                 key={project.id}
                 title={project.title}
@@ -103,7 +104,7 @@ export default function Home() {
         </section>
 
         {/* Skills Preview */}
-        <SkillsPreview skills={data.skills} />
+        <SkillsPreview skills={content.skills} />
 
         {/* CTA Section */}
         <section className="max-w-5xl mx-auto px-6 py-16 md:py-24 mb-12">
@@ -121,7 +122,11 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer
+        displayName={content.site.displayName}
+        contactEmail={content.site.contactEmail}
+        socialLinks={content.socialLinks}
+      />
     </>
   );
 }

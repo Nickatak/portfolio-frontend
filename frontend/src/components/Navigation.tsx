@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { siteConfig } from '@/config/site';
+interface NavigationProps {
+  displayName: string;
+}
 
-export default function Navigation() {
+export default function Navigation({ displayName }: NavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -14,7 +16,7 @@ export default function Navigation() {
           href="/"
           className="text-2xl font-bold tracking-tight"
         >
-          <span className="bg-gradient-text">{siteConfig.displayName}</span>
+          <span className="bg-gradient-text">{displayName}</span>
         </Link>
 
         {/* Mobile menu button */}
