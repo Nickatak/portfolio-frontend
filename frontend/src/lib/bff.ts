@@ -1,3 +1,6 @@
+import portfolioData from '@/data/portfolio.json';
+import socialData from '@/data/social.json';
+
 export interface PortfolioProject {
   id: number;
   slug?: string;
@@ -29,6 +32,10 @@ export interface PortfolioContent {
 
 const DEFAULT_BFF_BASE_URL = 'http://localhost:8001';
 
+function isDemoMode(): boolean {
+  return process.env.DEMO_MODE === 'true';
+}
+
 function getBffBaseUrl(): string {
   return (
     process.env.BFF_BASE_URL ||
@@ -37,7 +44,29 @@ function getBffBaseUrl(): string {
   );
 }
 
+function buildDemoContent(): PortfolioContent {
+  const displayName = process.env.NEXT_PUBLIC_DISPLAY_NAME || 'Your Name';
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hello@example.com';
+
+  return {
+    site: {
+      name: displayName,
+      displayName,
+      contactEmail,
+    },
+    projects: portfolioData.projects ?? [],
+    stats: portfolioData.stats ?? [],
+    skills: portfolioData.skills ?? [],
+    socialLinks: socialData.socialLinks ?? [],
+    contactLinks: socialData.contactLinks ?? [],
+  };
+}
+
 export async function getPortfolioContent(): Promise<PortfolioContent> {
+  if (isDemoMode()) {
+    return buildDemoContent();
+  }
+
   const baseUrl = getBffBaseUrl();
   const response = await fetch(`${baseUrl}/api/portfolio-content`, {
     cache: 'no-store',
@@ -50,7 +79,37 @@ export async function getPortfolioContent(): Promise<PortfolioContent> {
   return response.json();
 }
 
+export async function getPortfolioContentSafe(): Promise<{
+  content: PortfolioContent | null;
+  error?: string;
+}> {
+  try {
+    const content = await getPortfolioContent();
+    return { content };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { content: null, error: message };
+  }
+}
+
 export async function getProject(project: string): Promise<PortfolioProject> {
+  if (isDemoMode()) {
+    const demo = buildDemoContent();
+    const normalized = project.toLowerCase();
+    const match = demo.projects.find((item) => {
+      if (item.slug && item.slug.toLowerCase() === normalized) {
+        return true;
+      }
+      return String(item.id) === normalized;
+    });
+
+    if (!match) {
+      throw new Error(`Failed to fetch project: not found`);
+    }
+
+    return match;
+  }
+
   const baseUrl = getBffBaseUrl();
   const response = await fetch(`${baseUrl}/projects/${project}`, {
     cache: 'no-store',

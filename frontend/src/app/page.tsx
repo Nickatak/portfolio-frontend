@@ -2,7 +2,8 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import ProjectCard from '@/components/ProjectCard';
 import SkillsPreview from '@/components/SkillsPreview';
-import { getPortfolioContent } from '@/lib/bff';
+import { getPortfolioContentSafe } from '@/lib/bff';
+import BffUnavailable from '@/components/BffUnavailable';
 
 export const metadata = {
   title: 'Modern Portfolio | Full Stack Developer',
@@ -10,7 +11,11 @@ export const metadata = {
 };
 
 export default async function Home() {
-  const content = await getPortfolioContent();
+  const { content, error } = await getPortfolioContentSafe();
+
+  if (!content) {
+    return <BffUnavailable error={error} />;
+  }
 
   return (
     <>

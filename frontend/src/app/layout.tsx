@@ -22,11 +22,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isDemoMode = process.env.DEMO_MODE === "true";
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {isDemoMode && (
+          <div className="w-full bg-amber-100 text-amber-900 border-b border-amber-200 px-4 py-2 text-sm text-center">
+            Demo mode: booking requests are not sent or saved.
+          </div>
+        )}
         {children}
       </body>
     </html>

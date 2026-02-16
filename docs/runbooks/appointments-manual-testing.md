@@ -9,7 +9,7 @@ This runbook covers end-to-end manual testing for appointment creation:
 
 ## Prereqs
 - Docker running.
-- Ports available: `8001` (BFF), `8002` (calendar API), `9094` (Kafka).
+- Ports available: `8001` (BFF), `8002` (calendar API), `9094` (Kafka), `3306` (MySQL).
 - `notifier_service` compose network available (`notifier_service_default`).
 
 ## Start Services

@@ -119,6 +119,21 @@ git submodule update --init --recursive
 and `frontend/src/data/social.example.json` into the `*.json` files if they are
 missing.
 
+## Demo Mode (One Command)
+
+For a quick demo without any backend services:
+```bash
+make demo-up
+```
+
+This runs the frontend with a mock `POST /api/appointments` handler, so the
+booking flow works without Kafka or the calendar API.
+
+Stop the demo stack:
+```bash
+make demo-down
+```
+
 ## Local Development (App Only, No Docker)
 
 Use `.env` and run `make dev`.
@@ -154,6 +169,7 @@ This repo uses a single runtime env file at `.env` for local and Docker flows.
 ## Compose Layout
 
 - `docker-compose.yml`
+- `docker-compose.demo.yml`
 
 ## Environment Variables
 
@@ -165,7 +181,9 @@ Frequently edited:
 - `NEXT_PUBLIC_API_BASE_URL`
 - `NEXT_PUBLIC_DISPLAY_NAME`
 - `NEXT_PUBLIC_CONTACT_EMAIL`
+- `NEXT_PUBLIC_BFF_REPO_URL`
 - `PORTFOLIO_PORT`
+- `DEMO_MODE` (demo compose only)
 
 See `.env.example` for full defaults and comments.
 

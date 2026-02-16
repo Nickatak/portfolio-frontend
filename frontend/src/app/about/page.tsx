@@ -1,7 +1,8 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SkillBadge from '@/components/SkillBadge';
-import { getPortfolioContent } from '@/lib/bff';
+import { getPortfolioContentSafe } from '@/lib/bff';
+import BffUnavailable from '@/components/BffUnavailable';
 
 export const metadata = {
   title: 'About Me | Modern Portfolio',
@@ -9,7 +10,10 @@ export const metadata = {
 };
 
 export default async function About() {
-  const content = await getPortfolioContent();
+  const { content, error } = await getPortfolioContentSafe();
+  if (!content) {
+    return <BffUnavailable error={error} />;
+  }
   const frontendSkills = ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'JavaScript', 'HTML5/CSS3'];
   const backendSkills = ['Node.js', 'Express', 'Python', 'PostgreSQL', 'MongoDB', 'GraphQL'];
   const tools = ['Git', 'Docker', 'AWS', 'Vercel', 'GitHub', 'VS Code'];

@@ -1,10 +1,14 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import ContactClient from '@/components/ContactClient';
-import { getPortfolioContent } from '@/lib/bff';
+import { getPortfolioContentSafe } from '@/lib/bff';
+import BffUnavailable from '@/components/BffUnavailable';
 
 export default async function Contact() {
-  const content = await getPortfolioContent();
+  const { content, error } = await getPortfolioContentSafe();
+  if (!content) {
+    return <BffUnavailable error={error} />;
+  }
 
   return (
     <>

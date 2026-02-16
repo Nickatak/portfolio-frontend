@@ -1,7 +1,8 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import ProjectCard from '@/components/ProjectCard';
-import { getPortfolioContent } from '@/lib/bff';
+import { getPortfolioContentSafe } from '@/lib/bff';
+import BffUnavailable from '@/components/BffUnavailable';
 
 export const metadata = {
   title: 'Demos | Modern Portfolio',
@@ -9,7 +10,10 @@ export const metadata = {
 };
 
 export default async function Projects() {
-  const content = await getPortfolioContent();
+  const { content, error } = await getPortfolioContentSafe();
+  if (!content) {
+    return <BffUnavailable error={error} />;
+  }
 
   return (
     <>

@@ -6,10 +6,14 @@ ENV_FILE ?= .env
 COMPOSE_BASE_FILE ?= docker-compose.yml
 DOCKER_COMPOSE ?= docker compose --env-file $(ENV_FILE) -f $(COMPOSE_BASE_FILE)
 
+DEMO_COMPOSE_FILE ?= docker-compose.demo.yml
+DEMO_COMPOSE ?= docker compose -f $(DEMO_COMPOSE_FILE)
+
 .PHONY: help \
 	env-init prepare-portfolio-data \
 	install dev build start lint clean \
-	docker-build docker-up docker-down docker-logs
+	docker-build docker-up docker-down docker-logs \
+	demo-build demo-up demo-down demo-logs
 
 help:
 	@echo "Portfolio Frontend"
@@ -32,6 +36,12 @@ help:
 	@echo "  make docker-up         Run frontend container"
 	@echo "  make docker-down       Stop dev stack"
 	@echo "  make docker-logs       Follow dev logs"
+	@echo ""
+	@echo "Demo (frontend only, mock appointments):"
+	@echo "  make demo-build        Build demo image"
+	@echo "  make demo-up           Run demo stack"
+	@echo "  make demo-down         Stop demo stack"
+	@echo "  make demo-logs         Follow demo logs"
 
 env-init:
 	@if [ ! -f $(ENV_FILE) ]; then cp .env.example $(ENV_FILE); echo "Created $(ENV_FILE) from .env.example"; fi
@@ -81,5 +91,18 @@ docker-down:
 
 docker-logs:
 	$(DOCKER_COMPOSE) logs -f --tail=200
+
+# ---------- Demo Docker ----------
+demo-build: prepare-portfolio-data
+	$(DEMO_COMPOSE) build
+
+demo-up: prepare-portfolio-data
+	$(DEMO_COMPOSE) up --build
+
+demo-down:
+	$(DEMO_COMPOSE) down --remove-orphans
+
+demo-logs:
+	$(DEMO_COMPOSE) logs -f --tail=200
 
 .DEFAULT_GOAL := help
