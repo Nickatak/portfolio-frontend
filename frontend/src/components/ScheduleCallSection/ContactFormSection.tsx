@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { formatDateDisplay } from './utils';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8002';
 
 interface ContactFormSectionProps {
   selectedDate: Date | null;

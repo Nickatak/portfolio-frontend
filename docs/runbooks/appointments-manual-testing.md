@@ -9,7 +9,7 @@ This runbook covers end-to-end manual testing for appointment creation:
 
 ## Prereqs
 - Docker running.
-- Ports available: `8001` (BFF), `8002` (calendar API), `9094` (Kafka), `3306` (MySQL).
+- Ports available: `8001` (BFF), `8002` (calendar API), `9092` (Kafka), `3306` (MySQL).
 - `notifier_service` compose network available (`notifier_service_default`).
 
 ## Start Services
@@ -36,7 +36,7 @@ cd /home/nick/portfolio-stack/portfolio-calendar
 docker build -t portfolio-calendar:local .
 docker run -d --name portfolio-calendar \
   --network notifier_service_default \
-  -p 8002:8000 \
+  -p 8002:8002 \
   -e KAFKA_PRODUCER_ENABLED=true \
   -e KAFKA_BOOTSTRAP_SERVERS=kafka:19092 \
   -e KAFKA_TOPIC_APPOINTMENTS_CREATED=appointments.created \
@@ -46,7 +46,7 @@ docker run -d --name portfolio-calendar \
   portfolio-calendar:local
 ```
 
-If port `8000` is free, you can instead use the calendar repo's compose file:
+You can also use the calendar repo's compose file (binds to `8002`):
 ```bash
 cd /home/nick/portfolio-stack/portfolio-calendar
 docker compose up --build

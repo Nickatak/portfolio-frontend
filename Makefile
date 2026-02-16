@@ -58,9 +58,21 @@ install: prepare-portfolio-data
 	cd $(FRONTEND_DIR) && npm ci
 
 dev: prepare-portfolio-data
-	@set -a; [ -f $(ENV_FILE) ] && . ./$(ENV_FILE); set +a; \
+	@PORT=$${PORTFOLIO_PORT:-$(PORTFOLIO_PORT)}; \
+	if command -v lsof >/dev/null 2>&1; then \
+		if lsof -iTCP -sTCP:LISTEN -P | grep -q ":$${PORT} "; then \
+			echo "Port $${PORT} is already in use. Stop the conflicting process or set PORTFOLIO_PORT explicitly."; \
+			exit 1; \
+		fi; \
+	elif command -v ss >/dev/null 2>&1; then \
+		if ss -ltn | awk '{print $$4}' | grep -q ":$${PORT}$$"; then \
+			echo "Port $${PORT} is already in use. Stop the conflicting process or set PORTFOLIO_PORT explicitly."; \
+			exit 1; \
+		fi; \
+	fi; \
+	set -a; [ -f $(ENV_FILE) ] && . ./$(ENV_FILE); set +a; \
 	cd $(FRONTEND_DIR); \
-	NEXT_PUBLIC_API_BASE_URL=$${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000} \
+	NEXT_PUBLIC_API_BASE_URL=$${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8002} \
 	NEXT_PUBLIC_GOOGLE_CLIENT_ID=$${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-} \
 	NEXT_PUBLIC_DISPLAY_NAME=$${NEXT_PUBLIC_DISPLAY_NAME:-Your Name} \
 	NEXT_PUBLIC_CONTACT_EMAIL=$${NEXT_PUBLIC_CONTACT_EMAIL:-hello@example.com} \

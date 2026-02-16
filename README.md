@@ -1,40 +1,15 @@
 # Portfolio Stack
 
 This repository is the primary product repo for the portfolio application
-stack.
+stack. It owns the frontend (Next.js) and local orchestration helpers.
 
-It currently owns:
+Quick demo (frontend only): `make demo-up` (stop with `make demo-down`).
 
-- `frontend/` (Next.js web app)
-- app orchestration (`docker-compose.yml`, `Makefile`, `.env.example`)
+Backend services live in dedicated repositories:
 
-Backend services now live in dedicated repositories:
-
-- `portfolio-calendar` (calendar API producer)
 - `portfolio-bff` (content/dashboard BFF)
-
-The calendar API repo (`portfolio-calendar`) references two dedicated boundary
-repos as submodules:
-
-- `infra/messaging` -> `portfolio-infra-messaging`
-- `contracts/notifier` -> `portfolio-notifier-contracts`
-
-## Repository Evolution
-
-The architecture evolved in stages:
-
-1. Legacy split repos (`calendar`, `portfolio_orchestration`, frontend repo)
-2. Monorepo consolidation for fast iteration
-3. Boundary extraction into dedicated repos for messaging infra and contracts
-
-Net result: app code remains centralized here, while shared infra/contracts are
-now source-of-truth in dedicated repos.
-
-## Portfolio Stack Description
-
-System-wide architecture decisions and rationale live in:
-
-`docs/architecture/repository-structure.md`
+- `portfolio-calendar` (calendar API producer)
+- `notifier_service` (Kafka broker + notifier worker runtime)
 
 ## Ecosystem Repositories
 
@@ -44,6 +19,14 @@ System-wide architecture decisions and rationale live in:
 - `portfolio-infra-messaging`: Kafka broker + topic bootstrap definitions
 - `portfolio-notifier-contracts`: versioned event contract schemas
 - `notifier_microservice` (separate repo): notifier consumer/worker service
+
+## Port Map (Defaults)
+
+- Frontend (Next.js): `3000`
+- BFF (Django): `8001`
+- Calendar API: `8002`
+- Kafka (host, localhost-only): `9092`
+- MySQL (host): `3306`
 
 ## Architecture At A Glance
 
@@ -70,103 +53,95 @@ Event payload contract source of truth:
 portfolio-notifier-contracts
 ```
 
-## Where To Make Changes
+## Development
 
-| Change Goal | Primary Repo | Also Usually Update | Why |
-| --- | --- | --- | --- |
-| UI, pages, copy, frontend behavior | `portfolio` | None | Product UI lives in `frontend/` |
-| Content + dashboard backend | `portfolio-bff` | None | BFF owns content storage and admin UX |
-| API logic, booking rules, producer behavior | `portfolio-calendar` | `portfolio-notifier-contracts` when payload shape changes | Producer implementation is in `portfolio-calendar` |
-| Kafka broker settings, topic bootstrap, messaging compose | `portfolio-infra-messaging` | `portfolio-calendar` (submodule pointer update) | Infra source-of-truth is externalized |
-| Event schema fields/validation semantics | `portfolio-notifier-contracts` | `portfolio-calendar` and `notifier_microservice` | Contracts drive producer/consumer compatibility |
-| Notification delivery/runtime worker behavior | `notifier_microservice` | `portfolio-notifier-contracts` when schema changes | Consumer logic is outside product repo |
+There are three supported modes:
+1. Demo (frontend only): `make demo-up`
+2. Full stack (local)
+3. Full stack (Docker)
 
-## Common Multi-Repo Workflows
+### Full Stack (Local)
 
-1. Product-only change: edit in `portfolio`, run local checks, and commit only in `portfolio`.
-2. Contract change: update `portfolio-notifier-contracts` first, then update producer/consumer repos to match, then update submodule pointer(s) in `portfolio-calendar`.
-3. Messaging infra change: update `portfolio-infra-messaging`, validate compose/runtime, then update the `infra/messaging` submodule pointer in `portfolio-calendar`.
-4. Cross-cutting change (contract + producer + consumer): update contracts first, then producer/consumer implementations, then sync submodule pointers in repos that pin those contracts.
+1. Start Kafka:
+```bash
+cd ../notifier_service
+docker compose up -d kafka kafka-init
+```
 
-## Layout
-
-- `frontend/` - Next.js app
-- `docker-compose.yml` - frontend-only compose (`web`)
-- `docs/` - ADRs, architecture docs, and runbooks
-
-## Quick Start
-
-1. Create local env file:
-   ```bash
-   make env-init
-   ```
-2. Install dependencies:
-   ```bash
-   make install
-   ```
-3. Run the frontend:
-   ```bash
-   make dev
-   ```
-
-If you plan to work on `portfolio-calendar`, initialize its submodules:
+2. Start the calendar API (producer):
 ```bash
 cd ../portfolio-calendar
-git submodule update --init --recursive
+export KAFKA_PRODUCER_ENABLED=true
+export KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+dotnet run
 ```
 
-`make install` and `make dev` will copy `frontend/src/data/portfolio.example.json`
-and `frontend/src/data/social.example.json` into the `*.json` files if they are
-missing.
-
-## Demo Mode (One Command)
-
-For a quick demo without any backend services:
+3. Start the BFF (MySQL + Django):
 ```bash
-make demo-up
+cd ../portfolio-bff
+make db-up
+make install
+make migrate
+make dev
 ```
 
-This runs the frontend with a mock `POST /api/appointments` handler, so the
-booking flow works without Kafka or the calendar API.
-
-Stop the demo stack:
+4. Start the frontend:
 ```bash
-make demo-down
+make dev
 ```
 
-## Local Development (App Only, No Docker)
-
-Use `.env` and run `make dev`.
-
-Endpoints:
+Local ports:
 - Frontend: `http://localhost:3000`
-- Backend: run from `portfolio-calendar` or `portfolio-bff` as needed
+- BFF: `http://localhost:8001`
+- Calendar API: `http://localhost:8002`
 
-## Docker Workflows
+Ports are fixed by default. If you need to change one, set the explicit
+environment variable (e.g., `PORTFOLIO_PORT`, `PORTFOLIO_BFF_PORT`,
+`CALENDAR_API_PORT`) and update `NEXT_PUBLIC_API_BASE_URL` accordingly.
 
-### Docker (`.env`)
+### Full Stack (Docker)
 
-Frontend container:
-```bash
-make docker-up
-```
-
-To connect the frontend container to the BFF (also running in Docker), start the
-BFF compose file first:
+Start the BFF in Docker:
 ```bash
 cd ../portfolio-bff
 docker compose up -d --build
 ```
 
+Optional: start the calendar API in Docker:
+```bash
+cd ../portfolio-calendar
+docker compose up --build
+```
+
+Optional: enable Kafka publishing (appointments.created) in Docker:
+```bash
+cd ../notifier_service
+docker compose up -d kafka kafka-init
+
+cd ../portfolio-calendar
+docker build -t portfolio-calendar:local .
+docker run -d --name portfolio-calendar \
+  --network notifier_service_default \
+  -p 8002:8002 \
+  -e KAFKA_PRODUCER_ENABLED=true \
+  -e KAFKA_BOOTSTRAP_SERVERS=kafka:19092 \
+  -e KAFKA_TOPIC_APPOINTMENTS_CREATED=appointments.created \
+  -e KAFKA_NOTIFY_EMAIL_DEFAULT=true \
+  -e KAFKA_NOTIFY_SMS_DEFAULT=false \
+  -e ALLOWED_ORIGINS=http://localhost:3000 \
+  portfolio-calendar:local
+```
+
+If you intentionally publish the calendar API on a different port, update
+`NEXT_PUBLIC_API_BASE_URL` to match.
+
+Start the frontend container:
+```bash
+make docker-up
+```
+
 The frontend container resolves the BFF as `http://portfolio-bff:8000` on the
 shared `portfolio_net` network.
-
-Other compose operations:
-```bash
-make docker-build
-make docker-down
-make docker-logs
-```
 
 ## Environment Configuration
 
@@ -176,10 +151,7 @@ This repo uses a single runtime env file at `.env` for local and Docker flows.
 - Update `.env` values for your machine/runtime.
 - `make docker-*` commands provide Docker-based workflows.
 
-## Compose Layout
-
-- `docker-compose.yml`
-- `docker-compose.demo.yml`
+TODO: document the master compose tree in `docs/` once the stack is finalized.
 
 ## Environment Variables
 
@@ -196,33 +168,3 @@ Frequently edited:
 - `DEMO_MODE` (demo compose only)
 
 See `.env.example` for full defaults and comments.
-
-## Submodules
-
-Submodules live in `portfolio-calendar`:
-
-- `infra/messaging` (messaging compose/services)
-- `contracts/notifier` (event schema definitions)
-
-After pull/clone (from `portfolio-calendar`):
-```bash
-git submodule update --init --recursive
-```
-
-To move submodules to latest remote commits (from `portfolio-calendar`):
-```bash
-git submodule update --remote --merge
-```
-
-## App Documentation
-
-- Frontend details: `frontend/`
-- Backend services: `portfolio-bff`, `portfolio-calendar`
-
-## Architecture and Decisions
-
-- `docs/adr/0001-monorepo-adoption.md`
-- `docs/adr/0002-retain-github-and-adopt-prefix-grouping.md`
-- `docs/adr/0003-split-infra-and-contract-boundaries.md`
-- `docs/architecture/repository-structure.md`
-- `docs/runbooks/repository-split-process.md`
