@@ -31,8 +31,6 @@ COMPOSE_MESSAGING_FILE ?= infra/messaging/docker-compose.yml
 COMPOSE_FILES ?= -f $(COMPOSE_BASE_FILE) -f $(COMPOSE_MESSAGING_FILE)
 DEV_COMPOSE ?= docker compose --env-file $(ENV_FILE) $(COMPOSE_FILES)
 DEV_CORE_COMPOSE ?= docker compose --env-file $(ENV_FILE) -f $(COMPOSE_BASE_FILE)
-PROD_COMPOSE ?= docker compose --env-file $(ENV_FILE) $(COMPOSE_FILES)
-PROD_CORE_COMPOSE ?= docker compose --env-file $(ENV_FILE) -f $(COMPOSE_BASE_FILE)
 
 .PHONY: help \
 	env-init env-status env-validate prepare-portfolio-data \
@@ -41,7 +39,6 @@ PROD_CORE_COMPOSE ?= docker compose --env-file $(ENV_FILE) -f $(COMPOSE_BASE_FIL
 	local-install local-install-frontend local-install-backend \
 	local-up local-run local-run-frontend local-run-backend local-kill-ports local-migrate local-test local-shell local-seed local-reset-db local-build local-lint local-lint-fix local-clean local-clean-all \
 	dev-build dev-up dev-up-core dev-down dev-logs dev-ps dev-config dev-seed \
-	prod-build prod-up prod-up-core prod-down prod-logs prod-ps prod-config prod-seed \
 	up up-core compose-build down logs ps config \
 	install run build start lint lint-fix clean clean-all kill reset-db
 
@@ -79,16 +76,6 @@ help:
 	@echo "  make dev-ps            Show dev services"
 	@echo "  make dev-config        Render merged dev compose config"
 	@echo "  make dev-seed          Seed running dev DB with development seed data"
-	@echo ""
-	@echo "Prod Docker (uses $(ENV_FILE)):"
-	@echo "  make prod-build        Build app + messaging images"
-	@echo "  make prod-up           Start full stack in detached mode"
-	@echo "  make prod-up-core      Start app-only stack in detached mode"
-	@echo "  make prod-down         Stop prod stack"
-	@echo "  make prod-logs         Follow prod logs"
-	@echo "  make prod-ps           Show prod services"
-	@echo "  make prod-config       Render merged prod compose config"
-	@echo "  make prod-seed         Run production seed command (currently no-op)"
 	@echo ""
 	@echo "Legacy aliases remain available:"
 	@echo "  frontend/backend/up/down/etc. and install/run/build/start/lint/lint-fix/clean/clean-all/kill"
@@ -315,31 +302,6 @@ dev-config:
 
 dev-seed:
 	$(DEV_COMPOSE) exec calendar-api python manage.py seed_dev_data
-
-# ---------- Prod Docker ----------
-prod-build: prepare-portfolio-data
-	$(PROD_COMPOSE) build
-
-prod-up: prepare-portfolio-data
-	$(PROD_COMPOSE) up -d --build
-
-prod-up-core: prepare-portfolio-data
-	$(PROD_CORE_COMPOSE) up -d --build
-
-prod-down:
-	$(PROD_COMPOSE) down --remove-orphans
-
-prod-logs:
-	$(PROD_COMPOSE) logs -f --tail=200
-
-prod-ps:
-	$(PROD_COMPOSE) ps
-
-prod-config:
-	$(PROD_COMPOSE) config
-
-prod-seed:
-	$(PROD_COMPOSE) exec calendar-api python manage.py seed_prod_data
 
 up: dev-up
 

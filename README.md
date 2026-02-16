@@ -164,31 +164,6 @@ make dev-seed
 - `docker-compose.yml`
 - `infra/messaging/docker-compose.yml`
 
-### Prod Docker (`.env`)
-
-Full stack detached:
-
-```bash
-make prod-up
-```
-
-App-only detached:
-
-```bash
-make prod-up-core
-```
-
-Other compose operations:
-
-```bash
-make prod-build
-make prod-down
-make prod-logs
-make prod-ps
-make prod-config
-make prod-seed
-```
-
 Legacy aliases still work (`make up`, `make down`, etc.) and map to `dev-*` targets.
 
 ## Environment Configuration
@@ -198,7 +173,7 @@ This repo uses a single runtime env file at `.env` for local and Docker flows.
 - Run `make env-init` to create `.env` from `.env.example` if missing.
 - Run `make env-validate` to verify required keys are present and non-empty.
 - Update `.env` values for your machine/runtime.
-- `make dev-*` and `make prod-*` differ by compose behavior (foreground vs detached), not by separate env files.
+- `make dev-*` commands provide Docker-based local development workflows.
 
 ## Compose Layout
 
