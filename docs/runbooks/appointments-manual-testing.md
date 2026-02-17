@@ -12,6 +12,8 @@ This runbook covers end-to-end manual testing for appointment creation:
 - Ports available: `8001` (BFF), `8002` (calendar API), `9092` (Kafka), `3306` (MySQL).
 - `notifier_service` compose network available (`notifier_service_default`).
 
+Run the commands from the repo root.
+
 ## Start Services
 
 1. Start Kafka + notifier worker:
@@ -21,7 +23,7 @@ make notifier-up
 
 2. Start the BFF and its consumer:
 ```bash
-cd /home/nick/portfolio-stack/portfolio-bff
+cd portfolio-bff
 docker compose up -d --build
 ```
 
@@ -32,7 +34,7 @@ docker compose exec -T bff python manage.py seed_portfolio_content --reset
 
 3. Build and run the calendar API container on `8002`:
 ```bash
-cd /home/nick/portfolio-stack/portfolio-calendar
+cd portfolio-calendar
 docker build -t portfolio-calendar:local .
 docker run -d --name portfolio-calendar \
   --network notifier_service_default \
@@ -48,7 +50,7 @@ docker run -d --name portfolio-calendar \
 
 You can also use the calendar repo's compose file (binds to `8002`):
 ```bash
-cd /home/nick/portfolio-stack/portfolio-calendar
+cd portfolio-calendar
 docker compose up --build
 ```
 
@@ -103,17 +105,17 @@ docker run --rm --network notifier_service_default apache/kafka:3.9.0 \
 
 ## Verify DB Persistence
 ```bash
-cd /home/nick/portfolio-stack/portfolio-bff
+cd portfolio-bff
 docker compose exec -T bff python manage.py shell -c \
   "from content.models import AppointmentEvent; print(AppointmentEvent.objects.order_by('-id').first())"
 ```
 
 ## Stop Services
 ```bash
-cd /home/nick/portfolio-stack/portfolio-bff
+cd portfolio-bff
 docker compose down
 
-cd /home/nick/portfolio-stack
+cd ..
 make notifier-down
 
 docker rm -f portfolio-calendar
