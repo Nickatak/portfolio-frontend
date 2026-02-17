@@ -8,7 +8,7 @@
 
 The portfolio system originally operated as three repositories:
 
-1. `Nickatak/portfolio` (Next.js frontend)
+1. `Nickatak/portfolio-frontend` (Next.js frontend)
 2. `Nickatak/calendar` (Django API)
 3. `Nickatak/portfolio_orchestration` (compose + local orchestration glue)
 
@@ -32,7 +32,7 @@ At this stage of the project, the cost of repository boundaries exceeded their v
 
 ## Decision
 
-Adopt a single monorepo rooted at `Nickatak/portfolio` with explicit app boundaries:
+Adopt a single monorepo rooted at `Nickatak/portfolio-frontend` with explicit app boundaries:
 
 - `frontend/` for Next.js
 - `backend/` for Django
@@ -108,7 +108,7 @@ Accepted.
 
 ## Implementation Notes
 
-- Merged repositories into `Nickatak/portfolio`.
+- Merged repositories into `Nickatak/portfolio-frontend`.
 - Reorganized layout into `frontend/` and `backend/`.
 - Updated root `Makefile`, `docker-compose.yml`, `.env.example`, and docs accordingly.
 

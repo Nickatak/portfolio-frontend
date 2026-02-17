@@ -7,7 +7,16 @@ where each concern should live.
 
 ## Repositories
 
-### 1. `portfolio` (this repository)
+### 1. `portfolio-stack`
+
+Stack-level orchestration repo (parent workspace).
+
+- Owns:
+  - Top-level README and runbooks
+  - Stack Makefile and integration helpers
+  - Submodules for each service repo
+
+### 2. `portfolio-frontend` (this repository)
 
 Frontend-only product repo for the portfolio UI and local frontend workflows.
 
@@ -15,7 +24,7 @@ Frontend-only product repo for the portfolio UI and local frontend workflows.
   - `frontend/` (Next.js web app)
   - Frontend compose (`docker-compose.yml`, `Makefile`)
 
-### 2. `portfolio-bff`
+### 3. `portfolio-bff`
 
 Content and dashboard backend (BFF).
 
@@ -23,7 +32,7 @@ Content and dashboard backend (BFF).
   - Content models and admin workflows
   - Public API for frontend content
 
-### 3. `portfolio-calendar`
+### 4. `portfolio-calendar`
 
 Calendar API producer for appointments.
 
@@ -34,7 +43,7 @@ Calendar API producer for appointments.
   - `infra/messaging/` (submodule to `portfolio-infra-messaging`)
   - `contracts/notifier/` (submodule to `portfolio-notifier-contracts`)
 
-### 4. `portfolio-infra-messaging`
+### 5. `portfolio-infra-messaging`
 
 Shared Kafka runtime infrastructure.
 
@@ -43,7 +52,7 @@ Shared Kafka runtime infrastructure.
   - Topic bootstrap/init logic
   - Messaging-specific operational docs
 
-### 5. `portfolio-notifier-contracts`
+### 6. `portfolio-notifier-contracts`
 
 Event contract source of truth.
 
@@ -51,7 +60,7 @@ Event contract source of truth.
   - Versioned JSON schemas for notifier events
   - Compatibility and contract release guidance
 
-### 6. `notifier_microservice` (existing repo, future rename candidate)
+### 7. `notifier_microservice` (existing repo, future rename candidate)
 
 Consumer/worker implementation for notification processing.
 
@@ -59,7 +68,7 @@ Consumer/worker implementation for notification processing.
   - Event schemas from contracts repo
   - Kafka infra from messaging repo
 
-### 7. `ntakemori-deploy`
+### 8. `ntakemori-deploy`
 
 Host-level ingress and deployment orchestration for the portfolio stack.
 
@@ -70,7 +79,8 @@ Host-level ingress and deployment orchestration for the portfolio stack.
 
 ## Boundary Rules
 
-- Frontend UI lives in `portfolio`.
+- Stack orchestration lives in `portfolio-stack`.
+- Frontend UI lives in `portfolio-frontend`.
 - Content management and dashboard features live in `portfolio-bff`.
 - Scheduling/booking logic lives in `portfolio-calendar`.
 - Messaging infra and contracts remain dedicated boundaries.
@@ -78,7 +88,7 @@ Host-level ingress and deployment orchestration for the portfolio stack.
 
 ## Compose Model
 
-The `portfolio` repo compose file is frontend-only:
+The `portfolio-frontend` repo compose file is frontend-only:
 
 - `docker-compose.yml` (frontend service)
 
@@ -95,7 +105,7 @@ Canonical location:
 
 ```text
 portfolio-stack/
-├── portfolio/
+├── portfolio-frontend/
 │   ├── frontend/                     # product web app
 │   ├── docker-compose.yml            # frontend-only compose
 │   └── docs/
@@ -110,5 +120,5 @@ portfolio-stack/
 ```
 
 `ntakemori-deploy` lives alongside this stack (outside `portfolio-stack/`) and
-owns host-level ingress and overrides. The portfolio repo is the single source
-of truth for architecture decisions and rationale.
+owns host-level ingress and overrides. The `portfolio-frontend` repo remains
+the single source of truth for architecture decisions and rationale.

@@ -1,4 +1,4 @@
-name: portfolio-stack
+name: portfolio-frontend
 
 services:
   web:
