@@ -62,10 +62,19 @@ There are three supported modes:
 
 ### Full Stack (Local)
 
+Prereqs:
+- .NET SDK 8.x (calendar API targets net8.0)
+
 1. Start Kafka:
 ```bash
 cd ../notifier_service
 docker compose up -d kafka kafka-init
+```
+
+Optional (email notifications):
+```bash
+cd ../notifier_service
+docker compose up -d worker
 ```
 
 2. Start the calendar API (producer):
@@ -85,7 +94,14 @@ make migrate
 make dev
 ```
 
-4. Start the frontend:
+4. Start the BFF Kafka consumer (separate process):
+```bash
+cd ../portfolio-bff
+export KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+python manage.py consume_appointments
+```
+
+5. Start the frontend:
 ```bash
 make dev
 ```
@@ -95,9 +111,41 @@ Local ports:
 - BFF: `http://localhost:8001`
 - Calendar API: `http://localhost:8002`
 
+Notes:
+- The BFF consumer is a separate process. Without it, appointments won't be
+  stored in the BFF database.
+- Email delivery requires the notifier worker to be running and configured.
+
 Ports are fixed by default. If you need to change one, set the explicit
 environment variable (e.g., `PORTFOLIO_PORT`, `PORTFOLIO_BFF_PORT`,
 `CALENDAR_API_PORT`) and update `NEXT_PUBLIC_API_BASE_URL` accordingly.
+
+### WSL2 Notes
+
+WSL2 works for local dev. If you run the calendar API with `dotnet run`,
+install the .NET SDK inside your WSL distro (Ubuntu assumed).
+
+Check your Ubuntu version:
+```bash
+lsb_release -a
+```
+
+Install .NET SDK 8 (Ubuntu feed):
+```bash
+sudo add-apt-repository ppa:dotnet/backports
+sudo apt-get update
+sudo apt-get install -y dotnet-sdk-8.0
+```
+
+If you prefer to try the built-in Ubuntu feed first:
+```bash
+sudo apt-get update
+sudo apt-get install -y dotnet-sdk-8.0
+```
+
+Use only one package feed (Ubuntu or Microsoft) to avoid mix-ups.
+
+Official guide: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
 
 ### Full Stack (Docker)
 

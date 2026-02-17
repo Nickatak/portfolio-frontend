@@ -54,10 +54,10 @@ export default function ContactFormSection({
     return emailRegex.test(emailAddress);
   };
 
-  // Simple phone number validation (at least 10 digits)
+  // Simple phone number validation (10-15 digits)
   const isValidPhone = (phoneNumber: string): boolean => {
     const digitsOnly = phoneNumber.replace(/\D/g, '');
-    return digitsOnly.length >= 10;
+    return digitsOnly.length >= 10 && digitsOnly.length <= 15;
   };
 
   const handleBooking = async () => {
@@ -75,7 +75,7 @@ export default function ContactFormSection({
     // Validate phone if provided
     if (phone && !isValidPhone(phone)) {
       setErrorField('phone');
-      setMessage({ type: 'error', text: 'Please enter a valid phone number (at least 10 digits).' });
+      setMessage({ type: 'error', text: 'Please enter a valid phone number.' });
       return;
     }
 
@@ -124,7 +124,7 @@ export default function ContactFormSection({
       if (selectedDate && selectedTime) {
         onBookingSuccess?.(selectedDate, selectedTime);
       }
-      setMessage({ type: 'success', text: 'Meeting booked successfully! A confirmation email will be sent shortly.' });
+      setMessage({ type: 'success', text: 'Meeting booked successfully!' });
     } catch (error) {
       console.error('Error booking timeslot:', error);
       setMessage({ type: 'error', text: 'Failed to book the meeting. Please try again.' });
@@ -203,7 +203,7 @@ export default function ContactFormSection({
 
       <div>
         <label htmlFor="email" className="block text-sm font-semibold text-zinc-900 dark:text-white mb-2">
-          Email Address <span className="text-xs text-zinc-500 dark:text-zinc-400">(or Phone)</span>
+          Email Address
         </label>
         <input
           id="email"
@@ -225,7 +225,7 @@ export default function ContactFormSection({
 
       <div>
         <label htmlFor="phone" className="block text-sm font-semibold text-zinc-900 dark:text-white mb-2">
-          Phone Number <span className="text-xs text-zinc-500 dark:text-zinc-400">(or Email)</span>
+          Phone Number
         </label>
         <input
           id="phone"
@@ -236,7 +236,7 @@ export default function ContactFormSection({
             setPhone(e.target.value);
             setErrorField(null);
           }}
-          placeholder="+1 (555) 000-0000"
+          placeholder="555-123-4567"
           className={`w-full px-4 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 border text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 focus:outline-none focus:ring-2 transition-all ${
             errorField === 'phone'
               ? 'border-red-500 dark:border-red-500 focus:ring-red-600'
