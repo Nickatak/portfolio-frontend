@@ -101,7 +101,12 @@ export KAFKA_BOOTSTRAP_SERVERS=localhost:9092
 python manage.py consume_appointments
 ```
 
-5. Start the frontend:
+5. Install frontend dependencies (first time only):
+```bash
+make install
+```
+
+6. Start the frontend:
 ```bash
 make dev
 ```
