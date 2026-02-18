@@ -84,48 +84,6 @@ export default async function About() {
             </div>
           </section>
 
-          {/* Experience */}
-          <section className="mb-20">
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-8">Experience</h2>
-            <div className="space-y-6">
-              {[
-                {
-                  title: 'Software Engineer',
-                  company: 'Gozynta LLC (Remote)',
-                  period: 'May 2021 - Dec 2022',
-                  description: 'Full-stack software engineer working remotely on product features and maintenance.',
-                },
-                {
-                  title: "Teacher's Assistant",
-                  company: 'CodingDojo (Seattle, WA)',
-                  period: 'Sep 2016 - 2020',
-                  description: 'Troubleshot code and software issues, collaborated on projects, and documented coursework across multiple languages and frameworks.',
-                },
-                {
-                  title: 'Advanced Repair Agent',
-                  company: 'Best Buy (Glendora, CA)',
-                  period: 'Aug 2015 - Jun 2016',
-                  description: 'Diagnosed and repaired Windows/OSX/Linux systems, removed malware, and documented customer issues clearly.',
-                },
-                {
-                  title: 'Professional Tutor',
-                  company: 'Self-Employed (San Dimas, CA)',
-                  period: 'Sep 2012 - Aug 2015',
-                  description: 'STEM tutoring focused on improving student performance and identifying learning patterns.',
-                },
-              ].map((exp, index) => (
-                <div key={index} className="glass-effect rounded-lg p-6 border border-blue-200/30 dark:border-blue-900/30 hover:bg-blue-100/20 dark:hover:bg-blue-900/10 transition-all duration-300">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">{exp.title}</h3>
-                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-full">{exp.period}</span>
-                  </div>
-                  <p className="text-blue-600 dark:text-blue-400 font-medium mb-2">{exp.company}</p>
-                  <p className="text-zinc-700 dark:text-zinc-300">{exp.description}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
           {/* CTA */}
           <section className="glass-effect rounded-2xl p-12 md:p-16 text-center bg-gradient-to-br from-blue-600/5 to-pink-600/5 dark:from-blue-900/10 dark:to-pink-900/10 border border-blue-200/30 dark:border-blue-900/30">
             <h2 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white mb-4 tracking-tight">Let's work together</h2>
