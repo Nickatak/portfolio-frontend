@@ -19,4 +19,5 @@ services:
 
 networks:
   portfolio:
+    external: true
     name: portfolio_net
