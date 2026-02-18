@@ -84,10 +84,10 @@ clean:
 	find $(FRONTEND_DIR) -type d -name ".turbo" -exec rm -rf {} + 2>/dev/null || true
 
 # ---------- Dev Docker ----------
-docker-build:
+docker-build: env-init
 	$(DOCKER_COMPOSE) build
 
-docker-up:
+docker-up: env-init
 	$(DOCKER_COMPOSE) up --build
 
 docker-down:
