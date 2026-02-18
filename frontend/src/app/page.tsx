@@ -25,13 +25,13 @@ export default async function Home() {
         <section className="max-w-5xl mx-auto px-6 pt-32 pb-20 md:pt-40 md:pb-32">
           <div className="animate-fade-in-up">
             <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6 tracking-tight">
-              Building beautiful
+              Engineering calm,
               <br />
-              <span className="bg-gradient-text">digital experiences</span>
+              <span className="bg-gradient-text">reliable software</span>
             </h1>
             
               <p className="text-lg md:text-xl text-zinc-700 dark:text-zinc-300 max-w-2xl leading-relaxed mb-8">
-              Hi! I'm {content.site.displayName}, I'm a full-stack developer crafting modern web applications and automation tools with various combinations of tech stacks. I create performant, maintainable, accessible, and visually stunning digital products.
+              I’m {content.site.displayName}, a full-stack developer focused on clear boundaries, explicit contracts, and clean delivery. I ship systems that other engineers can pick up quickly and trust.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
@@ -124,6 +124,9 @@ export default async function Home() {
             >
               Let's Talk
             </a>
+            <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
+              Open to remote-first, part-time, and contract roles.
+            </p>
           </div>
         </section>
       </main>

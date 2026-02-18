@@ -14,9 +14,9 @@ export default async function About() {
   if (!content) {
     return <BffUnavailable error={error} />;
   }
-  const frontendSkills = ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'JavaScript', 'HTML5/CSS3'];
-  const backendSkills = ['Node.js', 'Express', 'Python', 'PostgreSQL', 'MongoDB', 'GraphQL'];
-  const tools = ['Git', 'Docker', 'AWS', 'Vercel', 'GitHub', 'VS Code'];
+  const frontendSkills = ['TypeScript', 'React', 'Next.js', 'Tailwind CSS', 'HTML/CSS'];
+  const backendSkills = ['Python', 'Django/DRF', 'C#/.NET 8', 'REST APIs', 'SQL (MySQL)'];
+  const systemsSkills = ['Kafka (event-driven)', 'Docker', 'Docker Compose', 'Git/GitHub'];
 
   return (
     <>
@@ -28,7 +28,7 @@ export default async function About() {
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">About me</h1>
             <div className="w-16 h-1 bg-gradient-to-r from-blue-600 to-pink-600 rounded-full mb-6" />
             <p className="text-lg md:text-xl text-zinc-700 dark:text-zinc-300 leading-relaxed max-w-3xl">
-              I'm a full-stack developer passionate about creating beautiful, performant web applications. With over 3 years of experience, I've worked with startups, individuals, and organizations to bring their ideas to life.
+              I’m a full-stack developer focused on clear architecture, reliable systems, and thoughtful UX. My path has been non-linear due to life circumstances, but I’ve used that time to build real projects end-to-end—frontend, backend, messaging, and deployment.
             </p>
           </section>
 
@@ -37,13 +37,15 @@ export default async function About() {
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-6">Background</h2>
             <div className="space-y-4 text-zinc-700 dark:text-zinc-300 leading-relaxed max-w-3xl">
               <p>
-                My journey in web development started with curiosity. I became fascinated by how websites work and decided to learn programming. What began as a hobby quickly evolved into a full-time career where I've had the privilege of working with exceptional teams and talented individuals.
+                I build systems that are easy to run, easy to reason about, and honest about their constraints. I prefer explicit contracts, clean boundaries, and developer workflows that don’t surprise you.
               </p>
               <p>
-                I specialize in building scalable web applications using modern technologies like React, Next.js, and Node.js. I'm passionate about writing clean, maintainable code and following best practices in web development. Performance, accessibility, and user experience are at the heart of everything I build.
+                I care about polish, but I care more about correctness and maintainability. My goal is to ship code that another engineer can pick up quickly and trust.
               </p>
               <p>
-                Beyond coding, I stay updated with industry trends, contribute to open-source projects, and mentor junior developers. I believe in continuous learning and sharing knowledge with the community.
+                I have Tourette’s, so I’m looking for remote-first roles with minimal travel and a calm work environment. I’m comfortable trading some compensation for a sustainable, low-distraction setup.
+                I’m open to relocation for the right fit, but I’m not able to commute daily.
+                I’m currently seeking part-time or contract roles.
               </p>
             </div>
           </section>
@@ -72,10 +74,10 @@ export default async function About() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">Tools</h3>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">Systems</h3>
                 <div className="flex flex-wrap gap-2">
-                  {tools.map((tool) => (
-                    <SkillBadge key={tool} skill={tool} level="expert" />
+                  {systemsSkills.map((skill) => (
+                    <SkillBadge key={skill} skill={skill} level="expert" />
                   ))}
                 </div>
               </div>
@@ -88,22 +90,28 @@ export default async function About() {
             <div className="space-y-6">
               {[
                 {
-                  title: 'Senior Frontend Developer',
-                  company: 'Tech Company Inc.',
-                  period: '2022 - Present',
-                  description: 'Leading frontend development for multiple high-impact projects, mentoring junior developers, and implementing best practices across the engineering team.',
+                  title: 'Software Engineer',
+                  company: 'Gozynta LLC (Remote)',
+                  period: 'May 2021 - Dec 2022',
+                  description: 'Full-stack software engineer working remotely on product features and maintenance.',
                 },
                 {
-                  title: 'Full Stack Developer',
-                  company: 'Digital Agency Co.',
-                  period: '2020 - 2022',
-                  description: 'Developed full-stack web applications, managed databases, and deployed applications to production. Collaborated with design and product teams.',
+                  title: "Teacher's Assistant",
+                  company: 'CodingDojo (Seattle, WA)',
+                  period: 'Sep 2016 - 2020',
+                  description: 'Troubleshot code and software issues, collaborated on projects, and documented coursework across multiple languages and frameworks.',
                 },
                 {
-                  title: 'Junior Web Developer',
-                  company: 'Startup Studio',
-                  period: '2018 - 2020',
-                  description: 'Assisted in developing responsive websites and web applications using modern frameworks. Learned best practices and contributed to team projects.',
+                  title: 'Advanced Repair Agent',
+                  company: 'Best Buy (Glendora, CA)',
+                  period: 'Aug 2015 - Jun 2016',
+                  description: 'Diagnosed and repaired Windows/OSX/Linux systems, removed malware, and documented customer issues clearly.',
+                },
+                {
+                  title: 'Professional Tutor',
+                  company: 'Self-Employed (San Dimas, CA)',
+                  period: 'Sep 2012 - Aug 2015',
+                  description: 'STEM tutoring focused on improving student performance and identifying learning patterns.',
                 },
               ].map((exp, index) => (
                 <div key={index} className="glass-effect rounded-lg p-6 border border-blue-200/30 dark:border-blue-900/30 hover:bg-blue-100/20 dark:hover:bg-blue-900/10 transition-all duration-300">
