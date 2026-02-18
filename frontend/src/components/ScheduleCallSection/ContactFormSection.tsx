@@ -47,6 +47,27 @@ export default function ContactFormSection({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [errorField, setErrorField] = useState<'email' | 'phone' | null>(null);
+  const friendlyErrorMessage = (errors: string[]): string => {
+    const normalized = errors.map((value) => value.trim().toLowerCase());
+
+    if (normalized.some((value) => value.includes('contact.phone must be a valid phone number'))) {
+      return 'Please enter a valid phone number (for example, +15551234567).';
+    }
+
+    if (normalized.some((value) => value.includes('contact.email is required'))) {
+      return 'Please enter an email address so we can confirm your appointment.';
+    }
+
+    if (normalized.some((value) => value.includes('contact.email or contact.phone is required'))) {
+      return 'Please enter either an email address or a phone number.';
+    }
+
+    if (normalized.some((value) => value.includes('appointment.end_time must be after appointment.start_time'))) {
+      return 'Please pick a time slot that ends after it starts.';
+    }
+
+    return errors.join(' ');
+  };
 
   // Simple email validation
   const isValidEmail = (emailAddress: string): boolean => {
@@ -116,7 +137,17 @@ export default function ContactFormSection({
       });
 
       if (!response.ok) {
-        throw new Error('Failed to book timeslot');
+        let errorMessage = 'We could not book your meeting. Please try again.';
+        try {
+          const errorBody = await response.json();
+          if (Array.isArray(errorBody?.errors) && errorBody.errors.length > 0) {
+            errorMessage = friendlyErrorMessage(errorBody.errors);
+          }
+        } catch {
+          // ignore JSON parse failures and use the default error message
+        }
+        setMessage({ type: 'error', text: errorMessage });
+        return;
       }
 
       const data = await response.json();
