@@ -10,7 +10,7 @@ DEMO_COMPOSE_FILE ?= docker-compose.demo.yml
 DEMO_COMPOSE ?= docker compose -f $(DEMO_COMPOSE_FILE)
 
 .PHONY: help \
-	env-init prepare-portfolio-data \
+	env-init \
 	install dev build start lint clean \
 	docker-build docker-up docker-down docker-logs \
 	demo-build demo-up demo-down demo-logs
@@ -46,18 +46,10 @@ help:
 env-init:
 	@if [ ! -f $(ENV_FILE) ]; then cp .env.example $(ENV_FILE); echo "Created $(ENV_FILE) from .env.example"; fi
 
-prepare-portfolio-data:
-	@if [ ! -f $(FRONTEND_DIR)/src/data/portfolio.json ] && [ -f $(FRONTEND_DIR)/src/data/portfolio.example.json ]; then \
-		cp $(FRONTEND_DIR)/src/data/portfolio.example.json $(FRONTEND_DIR)/src/data/portfolio.json; \
-	fi
-	@if [ ! -f $(FRONTEND_DIR)/src/data/social.json ] && [ -f $(FRONTEND_DIR)/src/data/social.example.json ]; then \
-		cp $(FRONTEND_DIR)/src/data/social.example.json $(FRONTEND_DIR)/src/data/social.json; \
-	fi
-
-install: prepare-portfolio-data
+install:
 	cd $(FRONTEND_DIR) && npm ci
 
-dev: prepare-portfolio-data
+dev:
 	@PORT=$${PORTFOLIO_PORT:-$(PORTFOLIO_PORT)}; \
 	if command -v lsof >/dev/null 2>&1; then \
 		if lsof -iTCP -sTCP:LISTEN -P | grep -q ":$${PORT} "; then \
@@ -78,7 +70,7 @@ dev: prepare-portfolio-data
 	NEXT_PUBLIC_CONTACT_EMAIL=$${NEXT_PUBLIC_CONTACT_EMAIL:-hello@example.com} \
 	npm run dev -- --hostname 0.0.0.0 --port $${PORTFOLIO_PORT:-$(PORTFOLIO_PORT)}
 
-build: prepare-portfolio-data
+build:
 	cd $(FRONTEND_DIR) && npm run build
 
 start:
@@ -92,10 +84,10 @@ clean:
 	find $(FRONTEND_DIR) -type d -name ".turbo" -exec rm -rf {} + 2>/dev/null || true
 
 # ---------- Dev Docker ----------
-docker-build: prepare-portfolio-data
+docker-build:
 	$(DOCKER_COMPOSE) build
 
-docker-up: prepare-portfolio-data
+docker-up:
 	$(DOCKER_COMPOSE) up --build
 
 docker-down:
@@ -105,10 +97,10 @@ docker-logs:
 	$(DOCKER_COMPOSE) logs -f --tail=200
 
 # ---------- Demo Docker ----------
-demo-build: prepare-portfolio-data
+demo-build:
 	$(DEMO_COMPOSE) build
 
-demo-up: prepare-portfolio-data
+demo-up:
 	$(DEMO_COMPOSE) up --build
 
 demo-down:
