@@ -1,5 +1,5 @@
-import portfolioData from '@/data/portfolio.json';
-import socialData from '@/data/social.json';
+import portfolioExample from '@/data/portfolio.example.json';
+import socialExample from '@/data/social.example.json';
 
 export interface PortfolioProject {
   id: number;
@@ -44,9 +44,29 @@ function getBffBaseUrl(): string {
   );
 }
 
-function buildDemoContent(): PortfolioContent {
+async function loadOptionalJson<T>(filename: string, fallback: T): Promise<T> {
+  if (typeof window !== 'undefined') {
+    return fallback;
+  }
+
+  try {
+    const { readFile } = await import('fs/promises');
+    const { join } = await import('path');
+    const filePath = join(process.cwd(), 'src', 'data', filename);
+    const raw = await readFile(filePath, 'utf-8');
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+async function buildDemoContent(): Promise<PortfolioContent> {
   const displayName = process.env.NEXT_PUBLIC_DISPLAY_NAME || 'Your Name';
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hello@example.com';
+  const [portfolioData, socialData] = await Promise.all([
+    loadOptionalJson('portfolio.json', portfolioExample),
+    loadOptionalJson('social.json', socialExample),
+  ]);
 
   return {
     site: {
@@ -94,7 +114,7 @@ export async function getPortfolioContentSafe(): Promise<{
 
 export async function getProject(project: string): Promise<PortfolioProject> {
   if (isDemoMode()) {
-    const demo = buildDemoContent();
+    const demo = await buildDemoContent();
     const normalized = project.toLowerCase();
     const match = demo.projects.find((item) => {
       if (item.slug && item.slug.toLowerCase() === normalized) {
