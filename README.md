@@ -23,7 +23,7 @@ Full stack instructions live in the parent stack repo: `../README.md`.
 ```bash
 make env-init
 make install
-make dev
+make local-up
 ```
 
 The dev server runs on `http://localhost:3000`.

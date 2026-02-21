@@ -11,7 +11,7 @@ DEMO_COMPOSE ?= docker compose -f $(DEMO_COMPOSE_FILE)
 
 .PHONY: help \
 	env-init \
-	install dev build start lint clean \
+	install local-up build start lint clean \
 	docker-build docker-up docker-down docker-logs \
 	demo-build demo-up demo-down demo-logs
 
@@ -25,7 +25,7 @@ help:
 	@echo ""
 	@echo "Local (no Docker):"
 	@echo "  make install           Install frontend dependencies"
-	@echo "  make dev               Run Next.js dev server"
+	@echo "  make local-up          Run Next.js dev server"
 	@echo "  make build             Build frontend assets"
 	@echo "  make start             Start production server"
 	@echo "  make lint              Lint frontend"
@@ -49,7 +49,7 @@ env-init:
 install:
 	cd $(FRONTEND_DIR) && npm ci
 
-dev:
+local-up:
 	@PORT=$${PORTFOLIO_PORT:-$(PORTFOLIO_PORT)}; \
 	if command -v lsof >/dev/null 2>&1; then \
 		if lsof -iTCP -sTCP:LISTEN -P | grep -q ":$${PORT} "; then \
@@ -64,11 +64,12 @@ dev:
 	fi; \
 	set -a; [ -f $(ENV_FILE) ] && . ./$(ENV_FILE); set +a; \
 	cd $(FRONTEND_DIR); \
+	PORTFOLIO_PORT=$${PORT}; \
 	NEXT_PUBLIC_API_BASE_URL=$${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8002} \
 	NEXT_PUBLIC_GOOGLE_CLIENT_ID=$${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-} \
 	NEXT_PUBLIC_DISPLAY_NAME=$${NEXT_PUBLIC_DISPLAY_NAME:-Your Name} \
 	NEXT_PUBLIC_CONTACT_EMAIL=$${NEXT_PUBLIC_CONTACT_EMAIL:-hello@example.com} \
-	npm run dev -- --hostname 0.0.0.0 --port $${PORTFOLIO_PORT:-$(PORTFOLIO_PORT)}
+	npm run dev -- --hostname 0.0.0.0 --port $${PORT}
 
 build:
 	cd $(FRONTEND_DIR) && npm run build
@@ -83,7 +84,7 @@ clean:
 	rm -rf $(FRONTEND_DIR)/.next $(FRONTEND_DIR)/dist
 	find $(FRONTEND_DIR) -type d -name ".turbo" -exec rm -rf {} + 2>/dev/null || true
 
-# ---------- Dev Docker ----------
+# ---------- Docker ----------
 docker-build: env-init
 	$(DOCKER_COMPOSE) build
 
